@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All 5 Exam Apps – Complete Code Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#0d1117; --surface:#161b22; --border:#30363d; --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding:1.5rem;max-width:1100px;margin:0 auto}
+h1{font-size:2rem;background:linear-gradient(135deg,#58a6ff,#bc8cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem}
+.subtitle{color:var(--muted);margin-bottom:2rem}
+h2{font-size:1.4rem;margin:2.5rem 0 .5rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+h3{font-size:1.05rem;color:var(--muted);margin:1.2rem 0 .3rem}
+.app-header{display:flex;align-items:center;gap:12px}
+.app-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.app-desc{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin:8px 0 16px;color:var(--muted);font-size:.92rem}
+.file-tab{display:inline-block;background:rgba(88,166,255,.1);color:var(--accent);padding:4px 12px;border-radius:6px 6px 0 0;font-family:'JetBrains Mono',monospace;font-size:.8rem;margin-top:12px;font-weight:700}
+pre{background:#0d1117;border:1px solid var(--border);border-radius:0 8px 8px 8px;padding:1rem;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.55;margin:0 0 4px}
+.setup{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:1rem 0}
+.setup h3{margin-top:0;color:var(--accent)}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0}
+.toc a{color:var(--accent);text-decoration:none;background:var(--surface);border:1px solid var(--border);padding:8px 16px;border-radius:8px;font-weight:600;font-size:.9rem}
+.toc a:hover{background:rgba(88,166,255,.1)}
+.pattern-note{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:14px 18px;margin:1.5rem 0;font-size:.92rem}
+.pattern-note strong{color:var(--accent)}
+hr{border:none;border-top:1px solid var(--border);margin:2rem 0}
+</style>
+</head>
+<body>
+<h1>All 5 Exam Practice Apps</h1>
+<p class="subtitle">Complete working code for every predicted exam theme. Frontend only — no backend.</p>
+
+<div class="setup">
+<h3>Setup Commands (same for every app)</h3>
+<pre>npx create-expo-app AppName --template blank
+cd AppName
+npx expo install expo@54.0.23
+npm install @react-navigation/native @react-navigation/native-stack
+npx expo install react-native-screens react-native-safe-area-context
+npx expo start --localhost</pre>
+</div>
+
+<div class="pattern-note">
+<strong>The pattern across all 5 apps is identical:</strong> App.js holds shared state + navigation. HomeScreen renders a FlatList with conditional styling + delete + footer counter. AddScreen has TextInput fields + category picker buttons + Alert on save + goBack(). Only the field names and colours change.
+</div>
+
+<p style="margin-bottom:.5rem;font-weight:600">Jump to:</p>
+<div class="toc">
+<a href="#app0">DevTrack (Group B Exam)</a><a href="#app1">QuickDial (Contacts)</a><a href="#app2">MealPrep (Recipes)</a><a href="#app3">FitLog (Workout)</a><a href="#app4">WishList (Shopping)</a></div><hr><h2 id="app0"><div class="app-header"><div class="app-dot" style="background:#e53935"></div>DevTrack (Group B Exam)</div></h2><div class="app-desc">Task board — manage tasks with priority (High/Medium/Low). Red title for High priority. Complete button removes task. Total task counter in footer.</div><div class="file-tab">App.js</div><pre>import React, { useState } from &#x27;react&#x27;;
+import { NavigationContainer } from &#x27;@react-navigation/native&#x27;;
+import { createNativeStackNavigator } from &#x27;@react-navigation/native-stack&#x27;;
+import HomeScreen from &#x27;./screens/HomeScreen&#x27;;
+import AddTaskScreen from &#x27;./screens/AddTaskScreen&#x27;;
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  const [tasks, setTasks] = useState([
+    { id: &#x27;1&#x27;, title: &#x27;Fix login bug&#x27;, description: &#x27;Users cannot log in on iOS&#x27;, priority: &#x27;High&#x27; },
+    { id: &#x27;2&#x27;, title: &#x27;Update README&#x27;, description: &#x27;Add setup instructions&#x27;, priority: &#x27;Low&#x27; },
+    { id: &#x27;3&#x27;, title: &#x27;Design review&#x27;, description: &#x27;Review new dashboard mockups&#x27;, priority: &#x27;Medium&#x27; },
+  ]);
+
+  return (
+    &lt;NavigationContainer&gt;
+      &lt;Stack.Navigator&gt;
+        &lt;Stack.Screen name=&quot;Home&quot; options={{ title: &#x27;DevTrack&#x27; }}&gt;
+          {(props) =&gt; &lt;HomeScreen {...props} tasks={tasks} setTasks={setTasks} /&gt;}
+        &lt;/Stack.Screen&gt;
+        &lt;Stack.Screen name=&quot;AddTask&quot; options={{ title: &#x27;Add Task&#x27; }}&gt;
+          {(props) =&gt; &lt;AddTaskScreen {...props} setTasks={setTasks} /&gt;}
+        &lt;/Stack.Screen&gt;
+      &lt;/Stack.Navigator&gt;
+    &lt;/NavigationContainer&gt;
+  );
+}
+</pre><div class="file-tab">screens/HomeScreen.js</div><pre>import React from &#x27;react&#x27;;
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from &#x27;react-native&#x27;;
+
+const HomeScreen = ({ navigation, tasks, setTasks }) =&gt; {
+
+  const deleteTask = (id) =&gt; {
+    Alert.alert(&#x27;Complete Task&#x27;, &#x27;Mark this task as complete?&#x27;, [
+      { text: &#x27;Cancel&#x27;, style: &#x27;cancel&#x27; },
+      {
+        text: &#x27;Complete&#x27;,
+        onPress: () =&gt; setTasks((prev) =&gt; prev.filter((t) =&gt; t.id !== id)),
+      },
+    ]);
+  };
+
+  const getPriorityColor = (priority) =&gt; {
+    if (priority === &#x27;High&#x27;) return &#x27;#e53935&#x27;;
+    if (priority === &#x27;Medium&#x27;) return &#x27;#fb8c00&#x27;;
+    return &#x27;#43a047&#x27;;
+  };
+
+  const renderItem = ({ item }) =&gt; (
+    &lt;View style={styles.taskCard}&gt;
+      &lt;View style={styles.taskInfo}&gt;
+        &lt;Text style={[styles.taskTitle, { color: getPriorityColor(item.priority) }]}&gt;
+          {item.title}
+        &lt;/Text&gt;
+        &lt;Text style={styles.taskDesc}&gt;{item.description}&lt;/Text&gt;
+        &lt;View style={[styles.priorityBadge, { backgroundColor: getPriorityColor(item.priority) }]}&gt;
+          &lt;Text style={styles.priorityText}&gt;{item.priority}&lt;/Text&gt;
+        &lt;/View&gt;
+      &lt;/View&gt;
+      &lt;TouchableOpacity style={styles.completeBtn} onPress={() =&gt; deleteTask(item.id)}&gt;
+        &lt;Text style={styles.completeBtnText}&gt;✓&lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    &lt;/View&gt;
+  );
+
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;FlatList
+        data={tasks}
+        keyExtractor={(item) =&gt; item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={&lt;Text style={styles.emptyText}&gt;No tasks on the board.&lt;/Text&gt;}
+      /&gt;
+      &lt;View style={styles.footer}&gt;
+        &lt;Text style={styles.footerText}&gt;Total Tasks: {tasks.length}&lt;/Text&gt;
+        &lt;TouchableOpacity
+          style={styles.addBtn}
+          onPress={() =&gt; navigation.navigate(&#x27;AddTask&#x27;)}&gt;
+          &lt;Text style={styles.addBtnText}&gt;+ New Task&lt;/Text&gt;
+        &lt;/TouchableOpacity&gt;
+      &lt;/View&gt;
+    &lt;/View&gt;
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: &#x27;#f5f5f5&#x27; },
+  listContent: { padding: 16 },
+  taskCard: {
+    backgroundColor: &#x27;#fff&#x27;,
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 12,
+    flexDirection: &#x27;row&#x27;,
+    alignItems: &#x27;center&#x27;,
+    elevation: 2,
+    shadowColor: &#x27;#000&#x27;,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  taskInfo: { flex: 1 },
+  taskTitle: { fontSize: 17, fontWeight: &#x27;bold&#x27;, marginBottom: 4 },
+  taskDesc: { fontSize: 13, color: &#x27;#666&#x27;, marginBottom: 8 },
+  priorityBadge: {
+    alignSelf: &#x27;flex-start&#x27;,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 12,
+  },
+  priorityText: { color: &#x27;#fff&#x27;, fontSize: 11, fontWeight: &#x27;bold&#x27; },
+  completeBtn: {
+    backgroundColor: &#x27;#e8f5e9&#x27;,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: &#x27;center&#x27;,
+    alignItems: &#x27;center&#x27;,
+    marginLeft: 12,
+  },
+  completeBtnText: { color: &#x27;#43a047&#x27;, fontSize: 20, fontWeight: &#x27;bold&#x27; },
+  footer: {
+    flexDirection: &#x27;row&#x27;,
+    justifyContent: &#x27;space-between&#x27;,
+    alignItems: &#x27;center&#x27;,
+    padding: 16,
+    backgroundColor: &#x27;#fff&#x27;,
+    borderTopWidth: 1,
+    borderTopColor: &#x27;#e0e0e0&#x27;,
+  },
+  footerText: { fontSize: 16, fontWeight: &#x27;600&#x27;, color: &#x27;#333&#x27; },
+  addBtn: { backgroundColor: &#x27;#1976d2&#x27;, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 },
+  addBtnText: { color: &#x27;#fff&#x27;, fontWeight: &#x27;bold&#x27;, fontSize: 15 },
+  emptyText: { textAlign: &#x27;center&#x27;, color: &#x27;#999&#x27;, marginTop: 40, fontSize: 16 },
+});
+
+export default HomeScreen;
+</pre><div class="file-tab">screens/AddTaskScreen.js</div><pre>import React, { useState } from &#x27;react&#x27;;
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from &#x27;react-native&#x27;;
+
+const AddTaskScreen = ({ navigation, setTasks }) =&gt; {
+  const [title, setTitle] = useState(&#x27;&#x27;);
+  const [description, setDescription] = useState(&#x27;&#x27;);
+  const [priority, setPriority] = useState(&#x27;Medium&#x27;);
+
+  const handleSave = () =&gt; {
+    if (!title.trim()) {
+      Alert.alert(&#x27;Validation&#x27;, &#x27;Please enter a task title.&#x27;);
+      return;
+    }
+
+    const newTask = {
+      id: Math.random().toString(),
+      title: title.trim(),
+      description: description.trim(),
+      priority,
+    };
+
+    setTasks((prev) =&gt; [...prev, newTask]);
+    Alert.alert(&#x27;New Task&#x27;, `&quot;${title}&quot; added to your sprint.`);
+    navigation.goBack();
+  };
+
+  const priorities = [&#x27;High&#x27;, &#x27;Medium&#x27;, &#x27;Low&#x27;];
+
+  const getPriorityColor = (p) =&gt; {
+    if (p === &#x27;High&#x27;) return &#x27;#e53935&#x27;;
+    if (p === &#x27;Medium&#x27;) return &#x27;#fb8c00&#x27;;
+    return &#x27;#43a047&#x27;;
+  };
+
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;Text style={styles.label}&gt;Title&lt;/Text&gt;
+      &lt;TextInput
+        style={styles.input}
+        value={title}
+        onChangeText={setTitle}
+        placeholder=&quot;e.g. Fix login bug&quot;
+      /&gt;
+
+      &lt;Text style={styles.label}&gt;Description&lt;/Text&gt;
+      &lt;TextInput
+        style={[styles.input, styles.textArea]}
+        value={description}
+        onChangeText={setDescription}
+        placeholder=&quot;Describe the task...&quot;
+        multiline
+        numberOfLines={3}
+      /&gt;
+
+      &lt;Text style={styles.label}&gt;Priority&lt;/Text&gt;
+      &lt;View style={styles.priorityRow}&gt;
+        {priorities.map((p) =&gt; (
+          &lt;TouchableOpacity
+            key={p}
+            style={[
+              styles.priorityBtn,
+              priority === p &amp;&amp; { backgroundColor: getPriorityColor(p) },
+            ]}
+            onPress={() =&gt; setPriority(p)}&gt;
+            &lt;Text style={[styles.priorityBtnText, priority === p &amp;&amp; { color: &#x27;#fff&#x27; }]}&gt;
+              {p}
+            &lt;/Text&gt;
+          &lt;/TouchableOpacity&gt;
+        ))}
+      &lt;/View&gt;
+
+      &lt;TouchableOpacity style={styles.saveBtn} onPress={handleSave}&gt;
+        &lt;Text style={styles.saveBtnText}&gt;Save Task&lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    &lt;/View&gt;
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, backgroundColor: &#x27;#f5f5f5&#x27; },
+  label: { fontSize: 15, fontWeight: &#x27;600&#x27;, color: &#x27;#333&#x27;, marginTop: 16, marginBottom: 6 },
+  input: {
+    backgroundColor: &#x27;#fff&#x27;,
+    borderWidth: 1,
+    borderColor: &#x27;#ddd&#x27;,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+  },
+  textArea: { height: 80, textAlignVertical: &#x27;top&#x27; },
+  priorityRow: { flexDirection: &#x27;row&#x27;, gap: 10, marginTop: 4 },
+  priorityBtn: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: &#x27;#ddd&#x27;,
+    backgroundColor: &#x27;#fff&#x27;,
+    alignItems: &#x27;center&#x27;,
+  },
+  priorityBtnText: { fontWeight: &#x27;bold&#x27;, fontSize: 14, color: &#x27;#555&#x27; },
+  saveBtn: {
+    backgroundColor: &#x27;#1976d2&#x27;,
+    padding: 16,
+    borderRadius: 10,
+    marginTop: 30,
+    alignItems: &#x27;center&#x27;,
+  },
+  saveBtnText: { color: &#x27;#fff&#x27;, fontWeight: &#x27;bold&#x27;, fontSize: 17 },
+});
+
+export default AddTaskScreen;
+</pre><hr><h2 id="app1"><div class="app-header"><div class="app-dot" style="background:#1976d2"></div>QuickDial (Contacts)</div></h2><div class="app-desc">Contact list — store name, phone, category (Family/Work/Friend). Coloured avatar with initials. Category badge. Delete contact. Contact counter.</div><div class="file-tab">App.js</div><pre>import React, { useState } from &#x27;react&#x27;;
+import { NavigationContainer } from &#x27;@react-navigation/native&#x27;;
+import { createNativeStackNavigator } from &#x27;@react-navigation/native-stack&#x27;;
+import HomeScreen from &#x27;./screens/HomeScreen&#x27;;
+import AddContactScreen from &#x27;./screens/AddContactScreen&#x27;;
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  const [contacts, setContacts] = useState([
+    { id: &#x27;1&#x27;, name: &#x27;Sarah Murphy&#x27;, phone: &#x27;087 123 4567&#x27;, category: &#x27;Family&#x27; },
+    { id: &#x27;2&#x27;, name: &#x27;Dr. Downey&#x27;, phone: &#x27;091 555 0100&#x27;, category: &#x27;Work&#x27; },
+    { id: &#x27;3&#x27;, name: &#x27;Jake O Brien&#x27;, phone: &#x27;085 222 3344&#x27;, category: &#x27;Friend&#x27; },
+  ]);
+
+  return (
+    &lt;NavigationContainer&gt;
+      &lt;Stack.Navigator&gt;
+        &lt;Stack.Screen name=&quot;Home&quot; options={{ title: &#x27;QuickDial&#x27; }}&gt;
+          {(props) =&gt; &lt;HomeScreen {...props} contacts={contacts} setContacts={setContacts} /&gt;}
+        &lt;/Stack.Screen&gt;
+        &lt;Stack.Screen name=&quot;AddContact&quot; options={{ title: &#x27;Add Contact&#x27; }}&gt;
+          {(props) =&gt; &lt;AddContactScreen {...props} setContacts={setContacts} /&gt;}
+        &lt;/Stack.Screen&gt;
+      &lt;/Stack.Navigator&gt;
+    &lt;/NavigationContainer&gt;
+  );
+}
+</pre><div class="file-tab">screens/HomeScreen.js</div><pre>import React from &#x27;react&#x27;;
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from &#x27;react-native&#x27;;
+
+const HomeScreen = ({ navigation, contacts, setContacts }) =&gt; {
+
+  const deleteContact = (id) =&gt; {
+    Alert.alert(&#x27;Delete Contact&#x27;, &#x27;Remove this contact?&#x27;, [
+      { text: &#x27;Cancel&#x27;, style: &#x27;cancel&#x27; },
+      {
+        text: &#x27;Delete&#x27;,
+        style: &#x27;destructive&#x27;,
+        onPress: () =&gt; setContacts((prev) =&gt; prev.filter((c) =&gt; c.id !== id)),
+      },
+    ]);
+  };
+
+  const getCategoryColor = (category) =&gt; {
+    if (category === &#x27;Family&#x27;) return &#x27;#e53935&#x27;;
+    if (category === &#x27;Work&#x27;) return &#x27;#1976d2&#x27;;
+    return &#x27;#43a047&#x27;;
+  };
+
+  const getInitials = (name) =&gt; {
+    const parts = name.split(&#x27; &#x27;);
+    return parts.length &gt;= 2
+      ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+      : name.substring(0, 2).toUpperCase();
+  };
+
+  const renderItem = ({ item }) =&gt; (
+    &lt;View style={styles.contactCard}&gt;
+      &lt;View style={[styles.avatar, { backgroundColor: getCategoryColor(item.category) }]}&gt;
+        &lt;Text style={styles.avatarText}&gt;{getInitials(item.name)}&lt;/Text&gt;
+      &lt;/View&gt;
+      &lt;View style={styles.contactInfo}&gt;
+        &lt;Text style={styles.contactName}&gt;{item.name}&lt;/Text&gt;
+        &lt;Text style={styles.contactPhone}&gt;{item.phone}&lt;/Text&gt;
+        &lt;View style={[styles.categoryBadge, { backgroundColor: getCategoryColor(item.category) + &#x27;20&#x27; }]}&gt;
+          &lt;Text style={[styles.categoryText, { color: getCategoryColor(item.category) }]}&gt;
+            {item.category}
+          &lt;/Text&gt;
+        &lt;/View&gt;
+      &lt;/View&gt;
+      &lt;TouchableOpacity style={styles.deleteBtn} onPress={() =&gt; deleteContact(item.id)}&gt;
+        &lt;Text style={styles.deleteBtnText}&gt;✕&lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    &lt;/View&gt;
+  );
+
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;FlatList
+        data={contacts}
+        keyExtractor={(item) =&gt; item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={&lt;Text style={styles.emptyText}&gt;No contacts yet.&lt;/Text&gt;}
+      /&gt;
+      &lt;View style={styles.footer}&gt;
+        &lt;Text style={styles.footerText}&gt;Contacts: {contacts.length}&lt;/Text&gt;
+        &lt;TouchableOpacity
+          style={styles.addBtn}
+          onPress={() =&gt; navigation.navigate(&#x27;AddContact&#x27;)}&gt;
+          &lt;Text style={styles.addBtnText}&gt;+ Add Contact&lt;/Text&gt;
+        &lt;/TouchableOpacity&gt;
+      &lt;/View&gt;
+    &lt;/View&gt;
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: &#x27;#f5f5f5&#x27; },
+  listContent: { padding: 16 },
+  contactCard: {
+    backgroundColor: &#x27;#fff&#x27;,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 10,
+    flexDirection: &#x27;row&#x27;,
+    alignItems: &#x27;center&#x27;,
+    elevation: 2,
+    shadowColor: &#x27;#000&#x27;,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: &#x27;center&#x27;,
+    alignItems: &#x27;center&#x27;,
+    marginRight: 14,
+  },
+  avatarText: { color: &#x27;#fff&#x27;, fontWeight: &#x27;bold&#x27;, fontSize: 16 },
+  contactInfo: { flex: 1 },
+  contactName: { fontSize: 16, fontWeight: &#x27;bold&#x27;, color: &#x27;#222&#x27; },
+  contactPhone: { fontSize: 13, color: &#x27;#888&#x27;, marginTop: 2 },
+  categoryBadge: {
+    alignSelf: &#x27;flex-start&#x27;,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    marginTop: 6,
+  },
+  categoryText: { fontSize: 11, fontWeight: &#x27;600&#x27; },
+  deleteBtn: { padding: 8 },
+  deleteBtnText: { color: &#x27;#e53935&#x27;, fontSize: 18, fontWeight: &#x27;bold&#x27; },
+  footer: {
+    flexDirection: &#x27;row&#x27;,
+    justifyContent: &#x27;space-between&#x27;,
+    alignItems: &#x27;center&#x27;,
+    padding: 16,
+    backgroundColor: &#x27;#fff&#x27;,
+    borderTopWidth: 1,
+    borderTopColor: &#x27;#e0e0e0&#x27;,
+  },
+  footerText: { fontSize: 16, fontWeight: &#x27;600&#x27;, color: &#x27;#333&#x27; },
+  addBtn: { backgroundColor: &#x27;#1976d2&#x27;, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 },
+  addBtnText: { color: &#x27;#fff&#x27;, fontWeight: &#x27;bold&#x27; },
+  emptyText: { textAlign: &#x27;center&#x27;, color: &#x27;#999&#x27;, marginTop: 40, fontSize: 16 },
+});
+
+export default HomeScreen;
+</pre><div class="file-tab">screens/AddContactScreen.js</div><pre>import React, { useState } from &#x27;react&#x27;;
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from &#x27;react-native&#x27;;
+
+const AddContactScreen = ({ navigation, setContacts }) =&gt; {
+  const [name, setName] = useState(&#x27;&#x27;);
+  const [phone, setPhone] = useState(&#x27;&#x27;);
+  const [category, setCategory] = useState(&#x27;Friend&#x27;);
+
+  const handleSave = () =&gt; {
+    if (!name.trim()) {
+      Alert.alert(&#x27;Validation&#x27;, &#x27;Please enter a contact name.&#x27;);
+      return;
+    }
+    if (!phone.trim()) {
+      Alert.alert(&#x27;Validation&#x27;, &#x27;Please enter a phone number.&#x27;);
+      return;
+    }
+
+    const newContact = {
+      id: Math.random().toString(),
+      name: name.trim(),
+      phone: phone.trim(),
+      category,
+    };
+
+    setContacts((prev) =&gt; [...prev, newContact]);
+    Alert.alert(&#x27;Contact Added&#x27;, `${name} has been saved to your contacts.`);
+    navigation.goBack();
+  };
+
+  const categories = [&#x27;Family&#x27;, &#x27;Work&#x27;, &#x27;Friend&#x27;];
+
+  const getCategoryColor = (c) =&gt; {
+    if (c === &#x27;Family&#x27;) return &#x27;#e53935&#x27;;
+    if (c === &#x27;Work&#x27;) return &#x27;#1976d2&#x27;;
+    return &#x27;#43a047&#x27;;
+  };
+
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;Text style={styles.label}&gt;Name&lt;/Text&gt;
+      &lt;TextInput
+        style={styles.input}
+        value={name}
+        onChangeText={setName}
+        placeholder=&quot;e.g. John Smith&quot;
+      /&gt;
+
+      &lt;Text style={styles.label}&gt;Phone Number&lt;/Text&gt;
+      &lt;TextInput
+        style={styles.input}
+        value={phone}
+        onChangeText={setPhone}
+        placeholder=&quot;e.g. 087 123 4567&quot;
+        keyboardType=&quot;phone-pad&quot;
+      /&gt;
+
+      &lt;Text style={styles.label}&gt;Category&lt;/Text&gt;
+      &lt;View style={styles.categoryRow}&gt;
+        {categories.map((c) =&gt; (
+          &lt;TouchableOpacity
+            key={c}
+            style={[
+              styles.categoryBtn,
+              category === c &amp;&amp; { backgroundColor: getCategoryColor(c) },
+            ]}
+            onPress={() =&gt; setCategory(c)}&gt;
+            &lt;Text style={[styles.categoryBtnText, category === c &amp;&amp; { color: &#x27;#fff&#x27; }]}&gt;
+              {c}
+            &lt;/Text&gt;
+          &lt;/TouchableOpacity&gt;
+        ))}
+      &lt;/View&gt;
+
+      &lt;TouchableOpacity style={styles.saveBtn} onPress={handleSave}&gt;
+        &lt;Text style={styles.saveBtnText}&gt;Save Contact&lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    &lt;/View&gt;
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, backgroundColor: &#x27;#f5f5f5&#x27; },
+  label: { fontSize: 15, fontWeight: &#x27;600&#x27;, color: &#x27;#333&#x27;, marginTop: 16, marginBottom: 6 },
+  input: {
+    backgroundColor: &#x27;#fff&#x27;,
+    borderWidth: 1,
+    borderColor: &#x27;#ddd&#x27;,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+  },
+  categoryRow: { flexDirection: &#x27;row&#x27;, gap: 10, marginTop: 4 },
+  categoryBtn: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: &#x27;#ddd&#x27;,
+    backgroundColor: &#x27;#fff&#x27;,
+    alignItems: &#x27;center&#x27;,
+  },
+  categoryBtnText: { fontWeight: &#x27;bold&#x27;, fontSize: 14, color: &#x27;#555&#x27; },
+  saveBtn: {
+    backgroundColor: &#x27;#1976d2&#x27;,
+    padding: 16,
+    borderRadius: 10,
+    marginTop: 30,
+    alignItems: &#x27;center&#x27;,
+  },
+  saveBtnText: { color: &#x27;#fff&#x27;, fontWeight: &#x27;bold&#x27;, fontSize: 17 },
+});
+
+export default AddContactScreen;
+</pre><hr><h2 id="app2"><div class="app-header"><div class="app-dot" style="background:#5e35b1"></div>MealPrep (Recipes)</div></h2><div class="app-desc">Recipe planner — store name, ingredients, meal type (Breakfast/Lunch/Dinner). Coloured by meal type with emoji. Delete recipe. Recipe counter.</div><div class="file-tab">App.js</div><pre>import React, { useState } from &#x27;react&#x27;;
+import { NavigationContainer } from &#x27;@react-navigation/native&#x27;;
+import { createNativeStackNavigator } from &#x27;@react-navigation/native-stack&#x27;;
+import HomeScreen from &#x27;./screens/HomeScreen&#x27;;
+import AddRecipeScreen from &#x27;./screens/AddRecipeScreen&#x27;;
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  const [recipes, setRecipes] = useState([
+    { id: &#x27;1&#x27;, name: &#x27;Scrambled Eggs&#x27;, ingredients: &#x27;Eggs, butter, salt&#x27;, mealType: &#x27;Breakfast&#x27; },
+    { id: &#x27;2&#x27;, name: &#x27;Caesar Salad&#x27;, ingredients: &#x27;Romaine, croutons, parmesan&#x27;, mealType: &#x27;Lunch&#x27; },
+    { id: &#x27;3&#x27;, name: &#x27;Spaghetti Bolognese&#x27;, ingredients: &#x27;Pasta, mince, tomato sauce&#x27;, mealType: &#x27;Dinner&#x27; },
+  ]);
+
+  return (
+    &lt;NavigationContainer&gt;
+      &lt;Stack.Navigator&gt;
+        &lt;Stack.Screen name=&quot;Home&quot; options={{ title: &#x27;MealPrep&#x27; }}&gt;
+          {(props) =&gt; &lt;HomeScreen {...props} recipes={recipes} setRecipes={setRecipes} /&gt;}
+        &lt;/Stack.Screen&gt;
+        &lt;Stack.Screen name=&quot;AddRecipe&quot; options={{ title: &#x27;Add Recipe&#x27; }}&gt;
+          {(props) =&gt; &lt;AddRecipeScreen {...props} setRecipes={setRecipes} /&gt;}
+        &lt;/Stack.Screen&gt;
+      &lt;/Stack.Navigator&gt;
+    &lt;/NavigationContainer&gt;
+  );
+}
+</pre><div class="file-tab">screens/HomeScreen.js</div><pre>import React from &#x27;react&#x27;;
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from &#x27;react-native&#x27;;
+
+const HomeScreen = ({ navigation, recipes, setRecipes }) =&gt; {
+
+  const deleteRecipe = (id) =&gt; {
+    Alert.alert(&#x27;Remove Recipe&#x27;, &#x27;Delete this recipe?&#x27;, [
+      { text: &#x27;Cancel&#x27;, style: &#x27;cancel&#x27; },
+      {
+        text: &#x27;Delete&#x27;,
+        style: &#x27;destructive&#x27;,
+        onPress: () =&gt; setRecipes((prev) =&gt; prev.filter((r) =&gt; r.id !== id)),
+      },
+    ]);
+  };
+
+  const getMealColor = (mealType) =&gt; {
+    if (mealType === &#x27;Breakfast&#x27;) return &#x27;#fb8c00&#x27;;
+    if (mealType === &#x27;Lunch&#x27;) return &#x27;#43a047&#x27;;
+    return &#x27;#5e35b1&#x27;;
+  };
+
+  const getMealEmoji = (mealType) =&gt; {
+    if (mealType === &#x27;Breakfast&#x27;) return &#x27;🌅&#x27;;
+    if (mealType === &#x27;Lunch&#x27;) return &#x27;☀️&#x27;;
+    return &#x27;🌙&#x27;;
+  };
+
+  const renderItem = ({ item }) =&gt; (
+    &lt;View style={styles.recipeCard}&gt;
+      &lt;View style={styles.recipeHeader}&gt;
+        &lt;Text style={styles.emoji}&gt;{getMealEmoji(item.mealType)}&lt;/Text&gt;
+        &lt;View style={styles.recipeInfo}&gt;
+          &lt;Text style={[styles.recipeName, { color: getMealColor(item.mealType) }]}&gt;
+            {item.name}
+          &lt;/Text&gt;
+          &lt;Text style={styles.ingredients}&gt;{item.ingredients}&lt;/Text&gt;
+          &lt;View style={[styles.mealBadge, { backgroundColor: getMealColor(item.mealType) }]}&gt;
+            &lt;Text style={styles.mealBadgeText}&gt;{item.mealType}&lt;/Text&gt;
+          &lt;/View&gt;
+        &lt;/View&gt;
+      &lt;/View&gt;
+      &lt;TouchableOpacity style={styles.deleteBtn} onPress={() =&gt; deleteRecipe(item.id)}&gt;
+        &lt;Text style={styles.deleteBtnText}&gt;✕&lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    &lt;/View&gt;
+  );
+
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;FlatList
+        data={recipes}
+        keyExtractor={(item) =&gt; item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={&lt;Text style={styles.emptyText}&gt;No recipes yet. Add your first!&lt;/Text&gt;}
+      /&gt;
+      &lt;View style={styles.footer}&gt;
+        &lt;Text style={styles.footerText}&gt;Total Recipes: {recipes.length}&lt;/Text&gt;
+        &lt;TouchableOpacity
+          style={styles.addBtn}
+          onPress={() =&gt; navigation.navigate(&#x27;AddRecipe&#x27;)}&gt;
+          &lt;Text style={styles.addBtnText}&gt;+ Add Recipe&lt;/Text&gt;
+        &lt;/TouchableOpacity&gt;
+      &lt;/View&gt;
+    &lt;/View&gt;
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: &#x27;#fafafa&#x27; },
+  listContent: { padding: 16 },
+  recipeCard: {
+    backgroundColor: &#x27;#fff&#x27;,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 12,
+    flexDirection: &#x27;row&#x27;,
+    alignItems: &#x27;center&#x27;,
+    elevation: 2,
+    shadowColor: &#x27;#000&#x27;,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  recipeHeader: { flex: 1, flexDirection: &#x27;row&#x27;, alignItems: &#x27;center&#x27; },
+  emoji: { fontSize: 28, marginRight: 12 },
+  recipeInfo: { flex: 1 },
+  recipeName: { fontSize: 17, fontWeight: &#x27;bold&#x27;, marginBottom: 2 },
+  ingredients: { fontSize: 13, color: &#x27;#777&#x27;, marginBottom: 6 },
+  mealBadge: {
+    alignSelf: &#x27;flex-start&#x27;,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 12,
+  },
+  mealBadgeText: { color: &#x27;#fff&#x27;, fontSize: 11, fontWeight: &#x27;bold&#x27; },
+  deleteBtn: { padding: 8 },
+  deleteBtnText: { color: &#x27;#e53935&#x27;, fontSize: 18, fontWeight: &#x27;bold&#x27; },
+  footer: {
+    flexDirection: &#x27;row&#x27;,
+    justifyContent: &#x27;space-between&#x27;,
+    alignItems: &#x27;center&#x27;,
+    padding: 16,
+    backgroundColor: &#x27;#fff&#x27;,
+    borderTopWidth: 1,
+    borderTopColor: &#x27;#e0e0e0&#x27;,
+  },
+  footerText: { fontSize: 16, fontWeight: &#x27;600&#x27;, color: &#x27;#333&#x27; },
+  addBtn: { backgroundColor: &#x27;#5e35b1&#x27;, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 },
+  addBtnText: { color: &#x27;#fff&#x27;, fontWeight: &#x27;bold&#x27; },
+  emptyText: { textAlign: &#x27;center&#x27;, color: &#x27;#999&#x27;, marginTop: 40, fontSize: 16 },
+});
+
+export default HomeScreen;
+</pre><div class="file-tab">screens/AddRecipeScreen.js</div><pre>import React, { useState } from &#x27;react&#x27;;
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from &#x27;react-native&#x27;;
+
+const AddRecipeScreen = ({ navigation, setRecipes }) =&gt; {
+  const [name, setName] = useState(&#x27;&#x27;);
+  const [ingredients, setIngredients] = useState(&#x27;&#x27;);
+  const [mealType, setMealType] = useState(&#x27;Lunch&#x27;);
+
+  const handleSave = () =&gt; {
+    if (!name.trim()) {
+      Alert.alert(&#x27;Validation&#x27;, &#x27;Please enter a recipe name.&#x27;);
+      return;
+    }
+    if (!ingredients.trim()) {
+      Alert.alert(&#x27;Validation&#x27;, &#x27;Please enter at least one ingredient.&#x27;);
+      return;
+    }
+
+    const newRecipe = {
+      id: Math.random().toString(),
+      name: name.trim(),
+      ingredients: ingredients.trim(),
+      mealType,
+    };
+
+    setRecipes((prev) =&gt; [...prev, newRecipe]);
+    Alert.alert(&#x27;Recipe Added&#x27;, `&quot;${name}&quot; saved to your ${mealType} recipes!`);
+    navigation.goBack();
+  };
+
+  const mealTypes = [&#x27;Breakfast&#x27;, &#x27;Lunch&#x27;, &#x27;Dinner&#x27;];
+
+  const getMealColor = (m) =&gt; {
+    if (m === &#x27;Breakfast&#x27;) return &#x27;#fb8c00&#x27;;
+    if (m === &#x27;Lunch&#x27;) return &#x27;#43a047&#x27;;
+    return &#x27;#5e35b1&#x27;;
+  };
+
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;Text style={styles.label}&gt;Recipe Name&lt;/Text&gt;
+      &lt;TextInput
+        style={styles.input}
+        value={name}
+        onChangeText={setName}
+        placeholder=&quot;e.g. Chicken Stir Fry&quot;
+      /&gt;
+
+      &lt;Text style={styles.label}&gt;Ingredients&lt;/Text&gt;
+      &lt;TextInput
+        style={[styles.input, styles.textArea]}
+        value={ingredients}
+        onChangeText={setIngredients}
+        placeholder=&quot;e.g. Chicken, peppers, soy sauce, rice&quot;
+        multiline
+        numberOfLines={3}
+      /&gt;
+
+      &lt;Text style={styles.label}&gt;Meal Type&lt;/Text&gt;
+      &lt;View style={styles.mealRow}&gt;
+        {mealTypes.map((m) =&gt; (
+          &lt;TouchableOpacity
+            key={m}
+            style={[
+              styles.mealBtn,
+              mealType === m &amp;&amp; { backgroundColor: getMealColor(m) },
+            ]}
+            onPress={() =&gt; setMealType(m)}&gt;
+            &lt;Text style={[styles.mealBtnText, mealType === m &amp;&amp; { color: &#x27;#fff&#x27; }]}&gt;
+              {m}
+            &lt;/Text&gt;
+          &lt;/TouchableOpacity&gt;
+        ))}
+      &lt;/View&gt;
+
+      &lt;TouchableOpacity style={styles.saveBtn} onPress={handleSave}&gt;
+        &lt;Text style={styles.saveBtnText}&gt;Save Recipe&lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    &lt;/View&gt;
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, backgroundColor: &#x27;#fafafa&#x27; },
+  label: { fontSize: 15, fontWeight: &#x27;600&#x27;, color: &#x27;#333&#x27;, marginTop: 16, marginBottom: 6 },
+  input: {
+    backgroundColor: &#x27;#fff&#x27;,
+    borderWidth: 1,
+    borderColor: &#x27;#ddd&#x27;,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+  },
+  textArea: { height: 80, textAlignVertical: &#x27;top&#x27; },
+  mealRow: { flexDirection: &#x27;row&#x27;, gap: 10, marginTop: 4 },
+  mealBtn: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: &#x27;#ddd&#x27;,
+    backgroundColor: &#x27;#fff&#x27;,
+    alignItems: &#x27;center&#x27;,
+  },
+  mealBtnText: { fontWeight: &#x27;bold&#x27;, fontSize: 14, color: &#x27;#555&#x27; },
+  saveBtn: {
+    backgroundColor: &#x27;#5e35b1&#x27;,
+    padding: 16,
+    borderRadius: 10,
+    marginTop: 30,
+    alignItems: &#x27;center&#x27;,
+  },
+  saveBtnText: { color: &#x27;#fff&#x27;, fontWeight: &#x27;bold&#x27;, fontSize: 17 },
+});
+
+export default AddRecipeScreen;
+</pre><hr><h2 id="app3"><div class="app-header"><div class="app-dot" style="background:#e53935"></div>FitLog (Workout)</div></h2><div class="app-desc">Exercise tracker — store name, reps/duration, difficulty (Easy/Medium/Hard). Colour-coded difficulty bar and badge. Delete exercise. Exercise counter.</div><div class="file-tab">App.js</div><pre>import React, { useState } from &#x27;react&#x27;;
+import { NavigationContainer } from &#x27;@react-navigation/native&#x27;;
+import { createNativeStackNavigator } from &#x27;@react-navigation/native-stack&#x27;;
+import HomeScreen from &#x27;./screens/HomeScreen&#x27;;
+import AddExerciseScreen from &#x27;./screens/AddExerciseScreen&#x27;;
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  const [exercises, setExercises] = useState([
+    { id: &#x27;1&#x27;, name: &#x27;Push-ups&#x27;, reps: &#x27;20&#x27;, difficulty: &#x27;Easy&#x27; },
+    { id: &#x27;2&#x27;, name: &#x27;Deadlift&#x27;, reps: &#x27;8&#x27;, difficulty: &#x27;Hard&#x27; },
+    { id: &#x27;3&#x27;, name: &#x27;Plank&#x27;, reps: &#x27;60s&#x27;, difficulty: &#x27;Medium&#x27; },
+  ]);
+
+  return (
+    &lt;NavigationContainer&gt;
+      &lt;Stack.Navigator&gt;
+        &lt;Stack.Screen name=&quot;Home&quot; options={{ title: &#x27;FitLog&#x27; }}&gt;
+          {(props) =&gt; &lt;HomeScreen {...props} exercises={exercises} setExercises={setExercises} /&gt;}
+        &lt;/Stack.Screen&gt;
+        &lt;Stack.Screen name=&quot;AddExercise&quot; options={{ title: &#x27;Add Exercise&#x27; }}&gt;
+          {(props) =&gt; &lt;AddExerciseScreen {...props} setExercises={setExercises} /&gt;}
+        &lt;/Stack.Screen&gt;
+      &lt;/Stack.Navigator&gt;
+    &lt;/NavigationContainer&gt;
+  );
+}
+</pre><div class="file-tab">screens/HomeScreen.js</div><pre>import React from &#x27;react&#x27;;
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from &#x27;react-native&#x27;;
+
+const HomeScreen = ({ navigation, exercises, setExercises }) =&gt; {
+
+  const deleteExercise = (id) =&gt; {
+    Alert.alert(&#x27;Remove Exercise&#x27;, &#x27;Delete this exercise from your workout?&#x27;, [
+      { text: &#x27;Cancel&#x27;, style: &#x27;cancel&#x27; },
+      {
+        text: &#x27;Delete&#x27;,
+        style: &#x27;destructive&#x27;,
+        onPress: () =&gt; setExercises((prev) =&gt; prev.filter((e) =&gt; e.id !== id)),
+      },
+    ]);
+  };
+
+  const getDifficultyColor = (difficulty) =&gt; {
+    if (difficulty === &#x27;Hard&#x27;) return &#x27;#e53935&#x27;;
+    if (difficulty === &#x27;Medium&#x27;) return &#x27;#fb8c00&#x27;;
+    return &#x27;#43a047&#x27;;
+  };
+
+  const getDifficultyIcon = (difficulty) =&gt; {
+    if (difficulty === &#x27;Hard&#x27;) return &#x27;🔥&#x27;;
+    if (difficulty === &#x27;Medium&#x27;) return &#x27;💪&#x27;;
+    return &#x27;✅&#x27;;
+  };
+
+  const renderItem = ({ item }) =&gt; (
+    &lt;View style={styles.exerciseCard}&gt;
+      &lt;View style={[styles.diffBar, { backgroundColor: getDifficultyColor(item.difficulty) }]} /&gt;
+      &lt;View style={styles.exerciseInfo}&gt;
+        &lt;View style={styles.nameRow}&gt;
+          &lt;Text style={styles.icon}&gt;{getDifficultyIcon(item.difficulty)}&lt;/Text&gt;
+          &lt;Text style={[styles.exerciseName, { color: getDifficultyColor(item.difficulty) }]}&gt;
+            {item.name}
+          &lt;/Text&gt;
+        &lt;/View&gt;
+        &lt;Text style={styles.reps}&gt;Reps / Duration: {item.reps}&lt;/Text&gt;
+        &lt;View style={[styles.diffBadge, { backgroundColor: getDifficultyColor(item.difficulty) }]}&gt;
+          &lt;Text style={styles.diffBadgeText}&gt;{item.difficulty}&lt;/Text&gt;
+        &lt;/View&gt;
+      &lt;/View&gt;
+      &lt;TouchableOpacity style={styles.deleteBtn} onPress={() =&gt; deleteExercise(item.id)}&gt;
+        &lt;Text style={styles.deleteBtnText}&gt;✕&lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    &lt;/View&gt;
+  );
+
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;FlatList
+        data={exercises}
+        keyExtractor={(item) =&gt; item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={&lt;Text style={styles.emptyText}&gt;No exercises yet. Start your workout!&lt;/Text&gt;}
+      /&gt;
+      &lt;View style={styles.footer}&gt;
+        &lt;Text style={styles.footerText}&gt;Exercises: {exercises.length}&lt;/Text&gt;
+        &lt;TouchableOpacity
+          style={styles.addBtn}
+          onPress={() =&gt; navigation.navigate(&#x27;AddExercise&#x27;)}&gt;
+          &lt;Text style={styles.addBtnText}&gt;+ Add Exercise&lt;/Text&gt;
+        &lt;/TouchableOpacity&gt;
+      &lt;/View&gt;
+    &lt;/View&gt;
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: &#x27;#f5f5f5&#x27; },
+  listContent: { padding: 16 },
+  exerciseCard: {
+    backgroundColor: &#x27;#fff&#x27;,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 12,
+    flexDirection: &#x27;row&#x27;,
+    alignItems: &#x27;center&#x27;,
+    elevation: 2,
+    shadowColor: &#x27;#000&#x27;,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  diffBar: { width: 4, height: &#x27;100%&#x27;, borderRadius: 2, marginRight: 12, minHeight: 60 },
+  exerciseInfo: { flex: 1 },
+  nameRow: { flexDirection: &#x27;row&#x27;, alignItems: &#x27;center&#x27;, marginBottom: 4 },
+  icon: { fontSize: 18, marginRight: 8 },
+  exerciseName: { fontSize: 17, fontWeight: &#x27;bold&#x27; },
+  reps: { fontSize: 13, color: &#x27;#777&#x27;, marginBottom: 6 },
+  diffBadge: {
+    alignSelf: &#x27;flex-start&#x27;,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 12,
+  },
+  diffBadgeText: { color: &#x27;#fff&#x27;, fontSize: 11, fontWeight: &#x27;bold&#x27; },
+  deleteBtn: { padding: 8 },
+  deleteBtnText: { color: &#x27;#e53935&#x27;, fontSize: 18, fontWeight: &#x27;bold&#x27; },
+  footer: {
+    flexDirection: &#x27;row&#x27;,
+    justifyContent: &#x27;space-between&#x27;,
+    alignItems: &#x27;center&#x27;,
+    padding: 16,
+    backgroundColor: &#x27;#fff&#x27;,
+    borderTopWidth: 1,
+    borderTopColor: &#x27;#e0e0e0&#x27;,
+  },
+  footerText: { fontSize: 16, fontWeight: &#x27;600&#x27;, color: &#x27;#333&#x27; },
+  addBtn: { backgroundColor: &#x27;#e53935&#x27;, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 },
+  addBtnText: { color: &#x27;#fff&#x27;, fontWeight: &#x27;bold&#x27; },
+  emptyText: { textAlign: &#x27;center&#x27;, color: &#x27;#999&#x27;, marginTop: 40, fontSize: 16 },
+});
+
+export default HomeScreen;
+</pre><div class="file-tab">screens/AddExerciseScreen.js</div><pre>import React, { useState } from &#x27;react&#x27;;
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from &#x27;react-native&#x27;;
+
+const AddExerciseScreen = ({ navigation, setExercises }) =&gt; {
+  const [name, setName] = useState(&#x27;&#x27;);
+  const [reps, setReps] = useState(&#x27;&#x27;);
+  const [difficulty, setDifficulty] = useState(&#x27;Medium&#x27;);
+
+  const handleSave = () =&gt; {
+    if (!name.trim()) {
+      Alert.alert(&#x27;Validation&#x27;, &#x27;Please enter an exercise name.&#x27;);
+      return;
+    }
+    if (!reps.trim()) {
+      Alert.alert(&#x27;Validation&#x27;, &#x27;Please enter reps or duration.&#x27;);
+      return;
+    }
+
+    const newExercise = {
+      id: Math.random().toString(),
+      name: name.trim(),
+      reps: reps.trim(),
+      difficulty,
+    };
+
+    setExercises((prev) =&gt; [...prev, newExercise]);
+    Alert.alert(&#x27;Exercise Added&#x27;, `&quot;${name}&quot; added to your workout!`);
+    navigation.goBack();
+  };
+
+  const difficulties = [&#x27;Easy&#x27;, &#x27;Medium&#x27;, &#x27;Hard&#x27;];
+
+  const getDiffColor = (d) =&gt; {
+    if (d === &#x27;Hard&#x27;) return &#x27;#e53935&#x27;;
+    if (d === &#x27;Medium&#x27;) return &#x27;#fb8c00&#x27;;
+    return &#x27;#43a047&#x27;;
+  };
+
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;Text style={styles.label}&gt;Exercise Name&lt;/Text&gt;
+      &lt;TextInput
+        style={styles.input}
+        value={name}
+        onChangeText={setName}
+        placeholder=&quot;e.g. Squats&quot;
+      /&gt;
+
+      &lt;Text style={styles.label}&gt;Reps / Duration&lt;/Text&gt;
+      &lt;TextInput
+        style={styles.input}
+        value={reps}
+        onChangeText={setReps}
+        placeholder=&quot;e.g. 15 or 30s&quot;
+      /&gt;
+
+      &lt;Text style={styles.label}&gt;Difficulty&lt;/Text&gt;
+      &lt;View style={styles.diffRow}&gt;
+        {difficulties.map((d) =&gt; (
+          &lt;TouchableOpacity
+            key={d}
+            style={[
+              styles.diffBtn,
+              difficulty === d &amp;&amp; { backgroundColor: getDiffColor(d) },
+            ]}
+            onPress={() =&gt; setDifficulty(d)}&gt;
+            &lt;Text style={[styles.diffBtnText, difficulty === d &amp;&amp; { color: &#x27;#fff&#x27; }]}&gt;
+              {d}
+            &lt;/Text&gt;
+          &lt;/TouchableOpacity&gt;
+        ))}
+      &lt;/View&gt;
+
+      &lt;TouchableOpacity style={styles.saveBtn} onPress={handleSave}&gt;
+        &lt;Text style={styles.saveBtnText}&gt;Save Exercise&lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    &lt;/View&gt;
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, backgroundColor: &#x27;#f5f5f5&#x27; },
+  label: { fontSize: 15, fontWeight: &#x27;600&#x27;, color: &#x27;#333&#x27;, marginTop: 16, marginBottom: 6 },
+  input: {
+    backgroundColor: &#x27;#fff&#x27;,
+    borderWidth: 1,
+    borderColor: &#x27;#ddd&#x27;,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+  },
+  diffRow: { flexDirection: &#x27;row&#x27;, gap: 10, marginTop: 4 },
+  diffBtn: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: &#x27;#ddd&#x27;,
+    backgroundColor: &#x27;#fff&#x27;,
+    alignItems: &#x27;center&#x27;,
+  },
+  diffBtnText: { fontWeight: &#x27;bold&#x27;, fontSize: 14, color: &#x27;#555&#x27; },
+  saveBtn: {
+    backgroundColor: &#x27;#e53935&#x27;,
+    padding: 16,
+    borderRadius: 10,
+    marginTop: 30,
+    alignItems: &#x27;center&#x27;,
+  },
+  saveBtnText: { color: &#x27;#fff&#x27;, fontWeight: &#x27;bold&#x27;, fontSize: 17 },
+});
+
+export default AddExerciseScreen;
+</pre><hr><h2 id="app4"><div class="app-header"><div class="app-dot" style="background:#1976d2"></div>WishList (Shopping)</div></h2><div class="app-desc">Shopping wishlist — store name, price, category (Electronics/Clothing/Home). Price colour by threshold. Delete item. Item count + total price in footer.</div><div class="file-tab">App.js</div><pre>import React, { useState } from &#x27;react&#x27;;
+import { NavigationContainer } from &#x27;@react-navigation/native&#x27;;
+import { createNativeStackNavigator } from &#x27;@react-navigation/native-stack&#x27;;
+import HomeScreen from &#x27;./screens/HomeScreen&#x27;;
+import AddItemScreen from &#x27;./screens/AddItemScreen&#x27;;
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  const [items, setItems] = useState([
+    { id: &#x27;1&#x27;, name: &#x27;AirPods Pro&#x27;, price: &#x27;279&#x27;, category: &#x27;Electronics&#x27; },
+    { id: &#x27;2&#x27;, name: &#x27;Running Shoes&#x27;, price: &#x27;120&#x27;, category: &#x27;Clothing&#x27; },
+    { id: &#x27;3&#x27;, name: &#x27;Coffee Machine&#x27;, price: &#x27;89&#x27;, category: &#x27;Home&#x27; },
+  ]);
+
+  return (
+    &lt;NavigationContainer&gt;
+      &lt;Stack.Navigator&gt;
+        &lt;Stack.Screen name=&quot;Home&quot; options={{ title: &#x27;WishList&#x27; }}&gt;
+          {(props) =&gt; &lt;HomeScreen {...props} items={items} setItems={setItems} /&gt;}
+        &lt;/Stack.Screen&gt;
+        &lt;Stack.Screen name=&quot;AddItem&quot; options={{ title: &#x27;Add Item&#x27; }}&gt;
+          {(props) =&gt; &lt;AddItemScreen {...props} setItems={setItems} /&gt;}
+        &lt;/Stack.Screen&gt;
+      &lt;/Stack.Navigator&gt;
+    &lt;/NavigationContainer&gt;
+  );
+}
+</pre><div class="file-tab">screens/HomeScreen.js</div><pre>import React from &#x27;react&#x27;;
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from &#x27;react-native&#x27;;
+
+const HomeScreen = ({ navigation, items, setItems }) =&gt; {
+
+  const deleteItem = (id) =&gt; {
+    Alert.alert(&#x27;Remove Item&#x27;, &#x27;Remove this item from your wishlist?&#x27;, [
+      { text: &#x27;Cancel&#x27;, style: &#x27;cancel&#x27; },
+      {
+        text: &#x27;Remove&#x27;,
+        style: &#x27;destructive&#x27;,
+        onPress: () =&gt; setItems((prev) =&gt; prev.filter((i) =&gt; i.id !== id)),
+      },
+    ]);
+  };
+
+  const getCategoryColor = (category) =&gt; {
+    if (category === &#x27;Electronics&#x27;) return &#x27;#1976d2&#x27;;
+    if (category === &#x27;Clothing&#x27;) return &#x27;#8e24aa&#x27;;
+    return &#x27;#00897b&#x27;;
+  };
+
+  const getPriceColor = (price) =&gt; {
+    const p = parseFloat(price);
+    if (p &gt;= 200) return &#x27;#e53935&#x27;;
+    if (p &gt;= 100) return &#x27;#fb8c00&#x27;;
+    return &#x27;#43a047&#x27;;
+  };
+
+  const totalPrice = items.reduce((sum, item) =&gt; sum + parseFloat(item.price || 0), 0);
+
+  const renderItem = ({ item }) =&gt; (
+    &lt;View style={styles.itemCard}&gt;
+      &lt;View style={styles.itemInfo}&gt;
+        &lt;Text style={styles.itemName}&gt;{item.name}&lt;/Text&gt;
+        &lt;Text style={[styles.itemPrice, { color: getPriceColor(item.price) }]}&gt;
+          €{parseFloat(item.price).toFixed(2)}
+        &lt;/Text&gt;
+        &lt;View style={[styles.catBadge, { backgroundColor: getCategoryColor(item.category) }]}&gt;
+          &lt;Text style={styles.catBadgeText}&gt;{item.category}&lt;/Text&gt;
+        &lt;/View&gt;
+      &lt;/View&gt;
+      &lt;TouchableOpacity style={styles.deleteBtn} onPress={() =&gt; deleteItem(item.id)}&gt;
+        &lt;Text style={styles.deleteBtnText}&gt;✕&lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    &lt;/View&gt;
+  );
+
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;FlatList
+        data={items}
+        keyExtractor={(item) =&gt; item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={&lt;Text style={styles.emptyText}&gt;Your wishlist is empty.&lt;/Text&gt;}
+      /&gt;
+      &lt;View style={styles.footer}&gt;
+        &lt;View&gt;
+          &lt;Text style={styles.footerLabel}&gt;Items: {items.length}&lt;/Text&gt;
+          &lt;Text style={styles.footerTotal}&gt;Total: €{totalPrice.toFixed(2)}&lt;/Text&gt;
+        &lt;/View&gt;
+        &lt;TouchableOpacity
+          style={styles.addBtn}
+          onPress={() =&gt; navigation.navigate(&#x27;AddItem&#x27;)}&gt;
+          &lt;Text style={styles.addBtnText}&gt;+ Add Item&lt;/Text&gt;
+        &lt;/TouchableOpacity&gt;
+      &lt;/View&gt;
+    &lt;/View&gt;
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: &#x27;#f5f5f5&#x27; },
+  listContent: { padding: 16 },
+  itemCard: {
+    backgroundColor: &#x27;#fff&#x27;,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    flexDirection: &#x27;row&#x27;,
+    alignItems: &#x27;center&#x27;,
+    elevation: 2,
+    shadowColor: &#x27;#000&#x27;,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  itemInfo: { flex: 1 },
+  itemName: { fontSize: 17, fontWeight: &#x27;bold&#x27;, color: &#x27;#222&#x27;, marginBottom: 2 },
+  itemPrice: { fontSize: 20, fontWeight: &#x27;bold&#x27;, marginBottom: 6 },
+  catBadge: {
+    alignSelf: &#x27;flex-start&#x27;,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 12,
+  },
+  catBadgeText: { color: &#x27;#fff&#x27;, fontSize: 11, fontWeight: &#x27;bold&#x27; },
+  deleteBtn: { padding: 8 },
+  deleteBtnText: { color: &#x27;#e53935&#x27;, fontSize: 18, fontWeight: &#x27;bold&#x27; },
+  footer: {
+    flexDirection: &#x27;row&#x27;,
+    justifyContent: &#x27;space-between&#x27;,
+    alignItems: &#x27;center&#x27;,
+    padding: 16,
+    backgroundColor: &#x27;#fff&#x27;,
+    borderTopWidth: 1,
+    borderTopColor: &#x27;#e0e0e0&#x27;,
+  },
+  footerLabel: { fontSize: 13, color: &#x27;#888&#x27; },
+  footerTotal: { fontSize: 18, fontWeight: &#x27;bold&#x27;, color: &#x27;#333&#x27; },
+  addBtn: { backgroundColor: &#x27;#1976d2&#x27;, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 },
+  addBtnText: { color: &#x27;#fff&#x27;, fontWeight: &#x27;bold&#x27; },
+  emptyText: { textAlign: &#x27;center&#x27;, color: &#x27;#999&#x27;, marginTop: 40, fontSize: 16 },
+});
+
+export default HomeScreen;
+</pre><div class="file-tab">screens/AddItemScreen.js</div><pre>import React, { useState } from &#x27;react&#x27;;
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from &#x27;react-native&#x27;;
+
+const AddItemScreen = ({ navigation, setItems }) =&gt; {
+  const [name, setName] = useState(&#x27;&#x27;);
+  const [price, setPrice] = useState(&#x27;&#x27;);
+  const [category, setCategory] = useState(&#x27;Electronics&#x27;);
+
+  const handleSave = () =&gt; {
+    if (!name.trim()) {
+      Alert.alert(&#x27;Validation&#x27;, &#x27;Please enter an item name.&#x27;);
+      return;
+    }
+    if (!price.trim() || isNaN(parseFloat(price))) {
+      Alert.alert(&#x27;Validation&#x27;, &#x27;Please enter a valid price.&#x27;);
+      return;
+    }
+
+    const newItem = {
+      id: Math.random().toString(),
+      name: name.trim(),
+      price: price.trim(),
+      category,
+    };
+
+    setItems((prev) =&gt; [...prev, newItem]);
+    Alert.alert(&#x27;Item Added&#x27;, `&quot;${name}&quot; (€${parseFloat(price).toFixed(2)}) added to your wishlist!`);
+    navigation.goBack();
+  };
+
+  const categories = [&#x27;Electronics&#x27;, &#x27;Clothing&#x27;, &#x27;Home&#x27;];
+
+  const getCatColor = (c) =&gt; {
+    if (c === &#x27;Electronics&#x27;) return &#x27;#1976d2&#x27;;
+    if (c === &#x27;Clothing&#x27;) return &#x27;#8e24aa&#x27;;
+    return &#x27;#00897b&#x27;;
+  };
+
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;Text style={styles.label}&gt;Item Name&lt;/Text&gt;
+      &lt;TextInput
+        style={styles.input}
+        value={name}
+        onChangeText={setName}
+        placeholder=&quot;e.g. Nike Air Max&quot;
+      /&gt;
+
+      &lt;Text style={styles.label}&gt;Price (€)&lt;/Text&gt;
+      &lt;TextInput
+        style={styles.input}
+        value={price}
+        onChangeText={setPrice}
+        placeholder=&quot;e.g. 149.99&quot;
+        keyboardType=&quot;numeric&quot;
+      /&gt;
+
+      &lt;Text style={styles.label}&gt;Category&lt;/Text&gt;
+      &lt;View style={styles.catRow}&gt;
+        {categories.map((c) =&gt; (
+          &lt;TouchableOpacity
+            key={c}
+            style={[
+              styles.catBtn,
+              category === c &amp;&amp; { backgroundColor: getCatColor(c) },
+            ]}
+            onPress={() =&gt; setCategory(c)}&gt;
+            &lt;Text style={[styles.catBtnText, category === c &amp;&amp; { color: &#x27;#fff&#x27; }]}&gt;
+              {c}
+            &lt;/Text&gt;
+          &lt;/TouchableOpacity&gt;
+        ))}
+      &lt;/View&gt;
+
+      &lt;TouchableOpacity style={styles.saveBtn} onPress={handleSave}&gt;
+        &lt;Text style={styles.saveBtnText}&gt;Add to Wishlist&lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    &lt;/View&gt;
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, backgroundColor: &#x27;#f5f5f5&#x27; },
+  label: { fontSize: 15, fontWeight: &#x27;600&#x27;, color: &#x27;#333&#x27;, marginTop: 16, marginBottom: 6 },
+  input: {
+    backgroundColor: &#x27;#fff&#x27;,
+    borderWidth: 1,
+    borderColor: &#x27;#ddd&#x27;,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+  },
+  catRow: { flexDirection: &#x27;row&#x27;, gap: 10, marginTop: 4 },
+  catBtn: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: &#x27;#ddd&#x27;,
+    backgroundColor: &#x27;#fff&#x27;,
+    alignItems: &#x27;center&#x27;,
+  },
+  catBtnText: { fontWeight: &#x27;bold&#x27;, fontSize: 13, color: &#x27;#555&#x27; },
+  saveBtn: {
+    backgroundColor: &#x27;#1976d2&#x27;,
+    padding: 16,
+    borderRadius: 10,
+    marginTop: 30,
+    alignItems: &#x27;center&#x27;,
+  },
+  saveBtnText: { color: &#x27;#fff&#x27;, fontWeight: &#x27;bold&#x27;, fontSize: 17 },
+});
+
+export default AddItemScreen;
+</pre><hr>
+<div class="pattern-note">
+<strong>Study tip:</strong> Don't memorise all five apps. Instead, memorise <em>one</em> skeleton (App.js + HomeScreen + AddScreen) and practise swapping field names. If the exam says "BookShelf" with title/author/genre — you already know the pattern. Rename the variables, pick three colours, done.
+</div>
+
+</body></html>

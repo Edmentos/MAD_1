@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>React Native Frontend Cheatsheet — From Lab Slides Only</title>
+<style>
+:root{--bg:#0d1117;--s:#161b22;--b:#30363d;--t:#e6edf3;--m:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d29922;--r:#f85149;--p:#bc8cff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--t);line-height:1.5;padding:1rem;max-width:1000px;margin:0 auto;font-size:14px}
+h1{font-size:1.6rem;color:var(--a);margin-bottom:.2rem}
+h2{font-size:1.1rem;color:var(--p);margin:1.8rem 0 .4rem;padding-bottom:.3rem;border-bottom:1px solid var(--b)}
+h3{font-size:.92rem;color:var(--g);margin:1rem 0 .3rem}
+.sub{color:var(--m);margin-bottom:1rem;font-size:.85rem}
+.lab{color:var(--o);font-size:.75rem;font-weight:bold}
+pre{background:#0a0e14;border:1px solid var(--b);border-radius:6px;padding:.6rem .8rem;overflow-x:auto;font-family:'Courier New',monospace;font-size:.78rem;line-height:1.5;margin:.4rem 0;color:var(--t)}
+code{font-family:'Courier New',monospace;font-size:.82rem;background:rgba(88,166,255,.1);padding:1px 4px;border-radius:3px}
+.box{background:var(--s);border:1px solid var(--b);border-radius:8px;padding:.7rem 1rem;margin:.5rem 0;font-size:.9rem}
+.box.red{border-left:3px solid var(--r)}
+.box.green{border-left:3px solid var(--g)}
+.box.blue{border-left:3px solid var(--a)}
+.box.orange{border-left:3px solid var(--o)}
+table{width:100%;border-collapse:collapse;margin:.4rem 0;font-size:.82rem}
+th,td{padding:5px 8px;border:1px solid var(--b);text-align:left}
+th{background:rgba(88,166,255,.08);color:var(--a)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+@media(max-width:600px){.cols{grid-template-columns:1fr}}
+.kw{color:#ff7b72}.fn{color:#d2a8ff}.st{color:#a5d6ff}.cm{color:#8b949e;font-style:italic}.cp{color:#79c0ff}.nb{color:#ffa657}.op{color:#ff7b72}.pr{color:#7ee787}
+hr.sep{border:none;border-top:2px solid var(--b);margin:2rem 0}
+</style>
+</head>
+<body>
+
+<h1>React Native Frontend Cheatsheet</h1>
+<p class="sub">Only concepts taught in Dr. Downey's lab slides (Labs 1–9). Frontend only. Every section references which lab it came from.</p>
+
+<!-- ============================================================ -->
+<h2>1. What is React Native</h2>
+<p class="lab">Lab 1 — wk1_lab1</p>
+<!-- ============================================================ -->
+
+<div class="box blue">
+<strong>React</strong> = the core library. Handles component tree, state, virtual DOM diffing. Platform-agnostic.<br>
+<strong>React DOM</strong> = renderer for web browsers. Translates to HTML elements.<br>
+<strong>React Native</strong> = renderer for mobile. Maps components to native UI widgets (UIView on iOS, android.view.View on Android) via a bridge.<br><br>
+JSX code runs on a JavaScript virtual machine. During build, native code compiles to Java/C++ binaries. The JS is not compiled — it runs on the JS VM and communicates with native via JSON.
+</div>
+
+<!-- ============================================================ -->
+<h2>2. Core Components</h2>
+<p class="lab">Lab 3 — wk2_lab3</p>
+<!-- ============================================================ -->
+
+<div class="box orange">
+<strong>No HTML in React Native.</strong> Native devices don't have a DOM. You must use RN components, and every one must be explicitly imported from <code>'react-native'</code>.
+</div>
+
+<table>
+<tr><th>RN Component</th><th>Web Equivalent</th><th>Purpose</th></tr>
+<tr><td><code>&lt;View&gt;</code></td><td><code>&lt;div&gt;</code></td><td>Container / layout box. The mobile equivalent of a div.</td></tr>
+<tr><td><code>&lt;Text&gt;</code></td><td><code>&lt;p&gt;</code> / <code>&lt;span&gt;</code></td><td>Display text. ALL text must be inside Text or the app crashes.</td></tr>
+<tr><td><code>&lt;Image&gt;</code></td><td><code>&lt;img&gt;</code></td><td>Display images. Local (require) or network (uri). Must set width/height for network images.</td></tr>
+<tr><td><code>&lt;TextInput&gt;</code></td><td><code>&lt;input&gt;</code></td><td>User text entry. Uses <code>onChangeText</code> and <code>value</code> props.</td></tr>
+<tr><td><code>&lt;Button&gt;</code></td><td><code>&lt;button&gt;</code></td><td>Platform-native button. Self-closing. Uses <code>title</code> prop not children. Looks like iOS/Android native button automatically.</td></tr>
+<tr><td><code>&lt;TouchableOpacity&gt;</code></td><td><code>&lt;button&gt;</code></td><td>Custom pressable. Fades on press. Can wrap anything.</td></tr>
+<tr><td><code>&lt;TouchableHighlight&gt;</code></td><td><code>&lt;button&gt;</code></td><td>Custom pressable. Shows underlay colour on press. Must have exactly one child.</td></tr>
+<tr><td><code>&lt;ScrollView&gt;</code></td><td><code>overflow: scroll</code></td><td>Scrollable container. Renders ALL children. Good for small content only.</td></tr>
+<tr><td><code>&lt;FlatList&gt;</code></td><td>—</td><td>Efficient scrollable list. Only renders visible items. Use for long lists.</td></tr>
+<tr><td><code>&lt;ActivityIndicator&gt;</code></td><td>—</td><td>Loading spinner.</td></tr>
+</table>
+
+<h3>Import pattern</h3>
+<pre><span class="kw">import</span> { <span class="cp">View</span>, <span class="cp">Text</span>, <span class="cp">FlatList</span>, <span class="cp">TextInput</span>, <span class="cp">Button</span>,
+         <span class="cp">TouchableOpacity</span>, <span class="cp">TouchableHighlight</span>,
+         <span class="cp">StyleSheet</span>, <span class="cp">Alert</span>, <span class="cp">Image</span>, <span class="cp">ScrollView</span>,
+         <span class="cp">ActivityIndicator</span> } <span class="kw">from</span> <span class="st">'react-native'</span>;</pre>
+
+<!-- ============================================================ -->
+<h2>3. Styling — StyleSheet</h2>
+<p class="lab">Lab 3 — wk2_lab3</p>
+<!-- ============================================================ -->
+
+<div class="box blue">
+<strong>No CSS files in React Native.</strong> Styling is written in JavaScript using <code>StyleSheet.create()</code> or inline objects. Properties are camelCase. Values are numbers (no <code>px</code>).
+</div>
+
+<pre><span class="kw">import</span> { <span class="cp">StyleSheet</span> } <span class="kw">from</span> <span class="st">'react-native'</span>;
+
+<span class="kw">const</span> styles <span class="op">=</span> <span class="cp">StyleSheet</span>.<span class="fn">create</span>({
+  <span class="pr">container</span>: {
+    <span class="pr">flex</span>: <span class="nb">1</span>,
+    <span class="pr">padding</span>: <span class="nb">16</span>,
+    <span class="pr">backgroundColor</span>: <span class="st">'#f5f5f5'</span>,
+  },
+  <span class="pr">title</span>: {
+    <span class="pr">fontSize</span>: <span class="nb">20</span>,
+    <span class="pr">fontWeight</span>: <span class="st">'bold'</span>,
+    <span class="pr">color</span>: <span class="st">'red'</span>,
+  },
+});
+
+<span class="cm">// Apply:</span>
+<span class="cp">&lt;View</span> <span class="pr">style</span><span class="op">=</span>{styles.container}<span class="cp">&gt;</span>
+<span class="cp">&lt;Text</span> <span class="pr">style</span><span class="op">=</span>{styles.title}<span class="cp">&gt;</span>Hello<span class="cp">&lt;/Text&gt;</span>
+
+<span class="cm">// Inline:</span>
+<span class="cp">&lt;View</span> <span class="pr">style</span><span class="op">=</span>{{ <span class="pr">padding</span>: <span class="nb">10</span>, <span class="pr">backgroundColor</span>: <span class="st">'blue'</span> }}<span class="cp">&gt;</span>
+
+<span class="cm">// Combine multiple (array syntax):</span>
+<span class="cp">&lt;Text</span> <span class="pr">style</span><span class="op">=</span>{[styles.title, { <span class="pr">color</span>: <span class="st">'green'</span> }]}<span class="cp">&gt;</span>
+
+<span class="cm">// Conditional style:</span>
+<span class="cp">&lt;Text</span> <span class="pr">style</span><span class="op">=</span>{[styles.title, item.<span class="pr">priority</span> <span class="op">===</span> <span class="st">'High'</span> <span class="op">&amp;&amp;</span> { <span class="pr">color</span>: <span class="st">'red'</span> }]}<span class="cp">&gt;</span></pre>
+
+<div class="box green">
+<strong>Why StyleSheet.create()?</strong> From slides: provides better auto-completion in VSCode and allows potential internal performance optimisations by React Native. Clearly separates JSX structure from styling logic.
+</div>
+
+<!-- ============================================================ -->
+<h2>4. Flexbox Layout</h2>
+<p class="lab">Lab 5 — wk3_lab5</p>
+<!-- ============================================================ -->
+
+<div class="box blue">
+Every <code>&lt;View&gt;</code> in RN is automatically a flex container. Default <code>flexDirection</code> is <strong>column</strong> (top to bottom). On web the default is row.
+</div>
+
+<table>
+<tr><th>flexDirection</th><th>Main Axis</th><th>Cross Axis</th></tr>
+<tr><td><code>column</code> (default)</td><td>Top → Bottom</td><td>Left → Right</td></tr>
+<tr><td><code>row</code></td><td>Left → Right</td><td>Top → Bottom</td></tr>
+<tr><td><code>column-reverse</code></td><td>Bottom → Top</td><td>Right → Left</td></tr>
+<tr><td><code>row-reverse</code></td><td>Right → Left</td><td>Bottom → Top</td></tr>
+</table>
+
+<h3>justifyContent (main axis) and alignItems (cross axis)</h3>
+<pre><span class="cm">// Values for both:</span>
+<span class="st">'center'</span>  <span class="st">'flex-start'</span>  <span class="st">'flex-end'</span>
+<span class="st">'space-between'</span>  <span class="st">'space-around'</span>  <span class="st">'space-evenly'</span>
+<span class="st">'stretch'</span>  <span class="cm">// alignItems default — children fill cross axis</span></pre>
+
+<h3>flex (child sizing)</h3>
+<pre><span class="cm">// flex: 1 → fill all remaining space</span>
+<span class="cm">// flex: 2 vs flex: 1 → 2:1 ratio of free space</span>
+<span class="cm">// No flex → only takes up as much space as content needs</span>
+
+<span class="cp">&lt;View</span> <span class="pr">style</span><span class="op">=</span>{{ <span class="pr">flexDirection</span>: <span class="st">'row'</span> }}<span class="cp">&gt;</span>
+  <span class="cp">&lt;View</span> <span class="pr">style</span><span class="op">=</span>{{ <span class="pr">flex</span>: <span class="nb">1</span>, <span class="pr">backgroundColor</span>: <span class="st">'red'</span> }} <span class="cp">/&gt;</span>    <span class="cm">// takes 1/3</span>
+  <span class="cp">&lt;View</span> <span class="pr">style</span><span class="op">=</span>{{ <span class="pr">flex</span>: <span class="nb">2</span>, <span class="pr">backgroundColor</span>: <span class="st">'blue'</span> }} <span class="cp">/&gt;</span>   <span class="cm">// takes 2/3</span>
+<span class="cp">&lt;/View&gt;</span></pre>
+
+<h3>Row layout — input and button side by side</h3>
+<p class="lab">Lab 5 — wk3_lab5, slide 13</p>
+<pre><span class="cp">&lt;View</span> <span class="pr">style</span><span class="op">=</span>{{ <span class="pr">flexDirection</span>: <span class="st">'row'</span>, <span class="pr">alignItems</span>: <span class="st">'center'</span>, <span class="pr">gap</span>: <span class="nb">10</span> }}<span class="cp">&gt;</span>
+  <span class="cp">&lt;TextInput</span> <span class="pr">style</span><span class="op">=</span>{{ <span class="pr">flex</span>: <span class="nb">1</span>, <span class="pr">borderWidth</span>: <span class="nb">1</span>, <span class="pr">borderColor</span>: <span class="st">'#ddd'</span>, <span class="pr">padding</span>: <span class="nb">10</span> }} <span class="cp">/&gt;</span>
+  <span class="cp">&lt;Button</span> <span class="pr">title</span><span class="op">=</span><span class="st">"Add"</span> <span class="pr">onPress</span><span class="op">=</span>{handleAdd} <span class="cp">/&gt;</span>
+<span class="cp">&lt;/View&gt;</span></pre>
+
+<!-- ============================================================ -->
+<h2>5. TextInput — Handling User Input</h2>
+<p class="lab">Lab 3 — wk2_lab3, slide 20</p>
+<!-- ============================================================ -->
+
+<pre><span class="cm">// onChangeText — fires every keystroke</span>
+<span class="cm">// onSubmitEditing — fires when user presses enter/done</span>
+<span class="cm">// value — binds state to input (two-way binding)</span>
+
+<span class="cp">&lt;TextInput</span>
+  <span class="pr">value</span><span class="op">=</span>{text}
+  <span class="pr">onChangeText</span><span class="op">=</span>{setText}
+  <span class="pr">onSubmitEditing</span><span class="op">=</span>{handleSubmit}
+  <span class="pr">placeholder</span><span class="op">=</span><span class="st">"Enter text"</span>
+<span class="cp">/&gt;</span></pre>
+
+<h3>Two-way binding (from Lab 2)</h3>
+<p class="lab">Lab 2 — wk1_lab2, slide 35-36</p>
+<div class="box blue">
+By setting <code>value={enteredText}</code> on the input, you create two-way binding. The UI sends data to state via <code>onChangeText</code>, and state sends data back to the UI via <code>value</code>. This lets you programmatically reset the input (e.g. <code>setEnteredText('')</code> to clear after submit).
+</div>
+
+<pre><span class="kw">const</span> [enteredText, setEnteredText] <span class="op">=</span> <span class="fn">useState</span>(<span class="st">''</span>);
+
+<span class="cp">&lt;TextInput</span>
+  <span class="pr">value</span><span class="op">=</span>{enteredText}
+  <span class="pr">onChangeText</span><span class="op">=</span>{(text) <span class="op">=&gt;</span> <span class="fn">setEnteredText</span>(text)}
+  <span class="pr">placeholder</span><span class="op">=</span><span class="st">"Type here"</span>
+<span class="cp">/&gt;</span>
+
+<span class="cm">// Clear after save:</span>
+<span class="fn">setEnteredText</span>(<span class="st">''</span>);</pre>
+
+<!-- ============================================================ -->
+<h2>6. useState — State Management</h2>
+<p class="lab">Lab 2 — wk1_lab2, slide 32-33</p>
+<!-- ============================================================ -->
+
+<div class="box blue">
+React ignores changes to regular JavaScript variables. To make data changes visible on screen, you must use <strong>State</strong>, which explicitly instructs React to re-render the component. <code>useState</code> returns an array: the current value and a setter function.
+</div>
+
+<pre><span class="kw">import</span> { <span class="fn">useState</span> } <span class="kw">from</span> <span class="st">'react'</span>;
+
+<span class="cm">// Declare state</span>
+<span class="kw">const</span> [count, setCount] <span class="op">=</span> <span class="fn">useState</span>(<span class="nb">0</span>);         <span class="cm">// number</span>
+<span class="kw">const</span> [text, setText] <span class="op">=</span> <span class="fn">useState</span>(<span class="st">''</span>);          <span class="cm">// string</span>
+<span class="kw">const</span> [items, setItems] <span class="op">=</span> <span class="fn">useState</span>([]);        <span class="cm">// array</span>
+
+<span class="cm">// Update (triggers re-render)</span>
+<span class="fn">setCount</span>(<span class="nb">5</span>);
+<span class="fn">setText</span>(<span class="st">'hello'</span>);
+
+<span class="cm">// Functional update (guaranteed correct previous value)</span>
+<span class="fn">setCount</span>(prev <span class="op">=&gt;</span> prev + <span class="nb">1</span>);</pre>
+
+<h3>Immutable array updates</h3>
+<p class="lab">Lab 2 — wk1_lab2, slide 32</p>
+<div class="box red">
+<strong>Never use .push().</strong> It mutates the array but doesn't trigger a re-render. Use <code>.concat()</code> or spread <code>[...prev, item]</code> to create a new array.
+</div>
+
+<pre><span class="cm">// ADD to array</span>
+<span class="fn">setItems</span>(prev <span class="op">=&gt;</span> [...prev, newItem]);
+<span class="cm">// or</span>
+<span class="fn">setItems</span>(prev <span class="op">=&gt;</span> prev.<span class="fn">concat</span>(newItem));
+
+<span class="cm">// REMOVE from array</span>
+<span class="fn">setItems</span>(prev <span class="op">=&gt;</span> prev.<span class="fn">filter</span>(i <span class="op">=&gt;</span> i.<span class="pr">id</span> !== id));
+
+<span class="cm">// UPDATE one item in array</span>
+<span class="fn">setItems</span>(prev <span class="op">=&gt;</span> prev.<span class="fn">map</span>(i <span class="op">=&gt;</span> i.<span class="pr">id</span> <span class="op">===</span> id ? { ...i, <span class="pr">done</span>: <span class="nb">true</span> } : i));</pre>
+
+<!-- ============================================================ -->
+<h2>7. Props — Passing Data Between Components</h2>
+<p class="lab">Lab 2 — wk1_lab2, slides 19-20</p>
+<!-- ============================================================ -->
+
+<div class="box blue">
+Props are custom attributes that pass data parent → child. Every functional component receives a single <code>props</code> object. Use curly braces <code>{}</code> to pass JS values instead of strings.
+</div>
+
+<pre><span class="cm">// Parent passes data:</span>
+<span class="cp">&lt;GoalList</span> <span class="pr">goals</span><span class="op">=</span>{courseGoals} <span class="cp">/&gt;</span>
+
+<span class="cm">// Child receives via props:</span>
+<span class="kw">const</span> <span class="fn">GoalList</span> <span class="op">=</span> (props) <span class="op">=&gt;</span> {
+  <span class="kw">return</span> props.<span class="pr">goals</span>.<span class="fn">map</span>(goal <span class="op">=&gt;</span> <span class="cp">&lt;Text</span> <span class="pr">key</span><span class="op">=</span>{goal.<span class="pr">id</span>}<span class="cp">&gt;</span>{goal.<span class="pr">text</span>}<span class="cp">&lt;/Text&gt;</span>);
+};
+
+<span class="cm">// Or destructure:</span>
+<span class="kw">const</span> <span class="fn">GoalList</span> <span class="op">=</span> ({ goals }) <span class="op">=&gt;</span> { ... };</pre>
+
+<h3>Parent-child communication (lifting state up)</h3>
+<p class="lab">Lab 2 — wk1_lab2, slides 29-30</p>
+<div class="box green">
+To send data <strong>upwards</strong> (child → parent), the parent passes a callback function as a prop. Convention: name it <code>onSomething</code>. The child executes it with data.
+</div>
+
+<pre><span class="cm">// Parent:</span>
+<span class="kw">const</span> <span class="fn">addGoalHandler</span> <span class="op">=</span> (newGoal) <span class="op">=&gt;</span> {
+  <span class="fn">setCourseGoals</span>(prev <span class="op">=&gt;</span> prev.<span class="fn">concat</span>(newGoal));
+};
+<span class="cp">&lt;NewGoal</span> <span class="pr">onAddGoal</span><span class="op">=</span>{addGoalHandler} <span class="cp">/&gt;</span>
+
+<span class="cm">// Child:</span>
+props.<span class="fn">onAddGoal</span>(newGoal);  <span class="cm">// triggers parent's function</span></pre>
+
+<!-- ============================================================ -->
+<h2>8. Rendering Lists — .map() and FlatList</h2>
+<p class="lab">Lab 2 — wk1_lab2, slide 22-23 | Lab 4 — wk2_lab4, slide 10</p>
+<!-- ============================================================ -->
+
+<h3>.map() — transform array into JSX</h3>
+<pre>{items.<span class="fn">map</span>(item <span class="op">=&gt;</span> (
+  <span class="cp">&lt;Text</span> <span class="pr">key</span><span class="op">=</span>{item.<span class="pr">id</span>}<span class="cp">&gt;</span>{item.<span class="pr">text</span>}<span class="cp">&lt;/Text&gt;</span>
+))}</pre>
+
+<div class="box orange">
+<strong>Key prop is required.</strong> React needs a unique <code>key</code> for every list item to efficiently update the DOM. Usually use the item's <code>id</code>.
+</div>
+
+<h3>FlatList — efficient list for large data</h3>
+<pre><span class="cp">&lt;FlatList</span>
+  <span class="pr">data</span><span class="op">=</span>{items}
+  <span class="pr">keyExtractor</span><span class="op">=</span>{(item) <span class="op">=&gt;</span> item.<span class="pr">id</span>}
+  <span class="pr">renderItem</span><span class="op">=</span>{({ item }) <span class="op">=&gt;</span> (   <span class="cm">// NOTE: destructure { item }</span>
+    <span class="cp">&lt;Text&gt;</span>{item.<span class="pr">title</span>}<span class="cp">&lt;/Text&gt;</span>
+  )}
+  <span class="pr">ListEmptyComponent</span><span class="op">=</span>{<span class="cp">&lt;Text&gt;</span>No items<span class="cp">&lt;/Text&gt;</span>}
+  <span class="pr">contentContainerStyle</span><span class="op">=</span>{{ <span class="pr">padding</span>: <span class="nb">16</span> }}
+<span class="cp">/&gt;</span></pre>
+
+<h3>ScrollView vs FlatList</h3>
+<p class="lab">Lab 4 — wk2_lab4, slide 9</p>
+<table>
+<tr><th>ScrollView</th><th>FlatList</th></tr>
+<tr><td>Renders ALL children at once</td><td>Only renders visible items</td></tr>
+<tr><td>Good for small content</td><td>Good for long/dynamic lists</td></tr>
+<tr><td>Supports <code>horizontal</code> prop</td><td>Also supports <code>horizontal</code></td></tr>
+</table>
+
+<!-- ============================================================ -->
+<h2>9. Handling Events</h2>
+<p class="lab">Lab 2 — wk1_lab2, slides 25-28</p>
+<!-- ============================================================ -->
+
+<pre><span class="cm">// Button press</span>
+<span class="cp">&lt;Button</span> <span class="pr">title</span><span class="op">=</span><span class="st">"Press me"</span> <span class="pr">onPress</span><span class="op">=</span>{handlePress} <span class="cp">/&gt;</span>
+
+<span class="cm">// TouchableOpacity (custom styled)</span>
+<span class="cp">&lt;TouchableOpacity</span> <span class="pr">onPress</span><span class="op">=</span>{handlePress}<span class="cp">&gt;</span>
+  <span class="cp">&lt;Text&gt;</span>Tap me<span class="cp">&lt;/Text&gt;</span>
+<span class="cp">&lt;/TouchableOpacity&gt;</span>
+
+<span class="cm">// Form submit with event.preventDefault() (web React only)</span>
+<span class="kw">const</span> <span class="fn">addGoalHandler</span> <span class="op">=</span> (event) <span class="op">=&gt;</span> {
+  event.<span class="fn">preventDefault</span>();  <span class="cm">// prevents sending request to backend server</span>
+};</pre>
+
+<h3>TouchableHighlight</h3>
+<p class="lab">Lab 5 — wk3_lab5, slide 16</p>
+<pre><span class="cp">&lt;TouchableHighlight</span> <span class="pr">onPress</span><span class="op">=</span>{handlePress} <span class="pr">underlayColor</span><span class="op">=</span><span class="st">"#ddd"</span><span class="cp">&gt;</span>
+  <span class="cp">&lt;View&gt;</span><span class="cp">&lt;Text&gt;</span>Tap me<span class="cp">&lt;/Text&gt;&lt;/View&gt;</span>  <span class="cm">// must have exactly ONE child</span>
+<span class="cp">&lt;/TouchableHighlight&gt;</span></pre>
+
+<h3>Alert</h3>
+<pre><span class="cm">// Simple alert</span>
+<span class="cp">Alert</span>.<span class="fn">alert</span>(<span class="st">'Title'</span>, <span class="st">'Message'</span>);
+
+<span class="cm">// Alert with buttons</span>
+<span class="cp">Alert</span>.<span class="fn">alert</span>(<span class="st">'Title'</span>, <span class="st">'Message'</span>, [
+  { <span class="pr">text</span>: <span class="st">'Cancel'</span>, <span class="pr">style</span>: <span class="st">'cancel'</span> },
+  { <span class="pr">text</span>: <span class="st">'OK'</span>, <span class="pr">onPress</span>: () <span class="op">=&gt;</span> <span class="fn">doSomething</span>() },
+]);</pre>
+
+<!-- ============================================================ -->
+<h2>10. Images</h2>
+<p class="lab">Lab 5 — wk3_lab5, slide 14-15</p>
+<!-- ============================================================ -->
+
+<pre><span class="cm">// Local image (from assets folder)</span>
+<span class="cp">&lt;Image</span> <span class="pr">source</span><span class="op">=</span>{<span class="fn">require</span>(<span class="st">'./assets/icon.png'</span>)} <span class="pr">style</span><span class="op">=</span>{{ <span class="pr">width</span>: <span class="nb">100</span>, <span class="pr">height</span>: <span class="nb">100</span> }} <span class="cp">/&gt;</span>
+
+<span class="cm">// Network image (MUST specify width and height)</span>
+<span class="cp">&lt;Image</span>
+  <span class="pr">source</span><span class="op">=</span>{{ <span class="pr">uri</span>: <span class="st">'https://reactjs.org/logo-og.png'</span> }}
+  <span class="pr">style</span><span class="op">=</span>{{ <span class="pr">width</span>: <span class="nb">100</span>, <span class="pr">height</span>: <span class="nb">100</span> }}
+<span class="cp">/&gt;</span></pre>
+
+<div class="box orange">
+<strong>From slide notes:</strong> Dog image API for testing: <code>https://dog.ceo/api/breeds/image/random</code>
+</div>
+
+<!-- ============================================================ -->
+<h2>11. ScrollView &amp; PagerView</h2>
+<p class="lab">Lab 4 — wk2_lab4, slide 9</p>
+<!-- ============================================================ -->
+
+<pre><span class="cm">// Vertical scroll (default)</span>
+<span class="cp">&lt;ScrollView&gt;</span>
+  <span class="cp">&lt;Text&gt;</span>Item 1<span class="cp">&lt;/Text&gt;</span>
+  <span class="cp">&lt;Text&gt;</span>Item 2<span class="cp">&lt;/Text&gt;</span>
+<span class="cp">&lt;/ScrollView&gt;</span>
+
+<span class="cm">// Horizontal scroll</span>
+<span class="cp">&lt;ScrollView</span> <span class="pr">horizontal</span><span class="cp">&gt;</span>
+  <span class="cp">&lt;View</span> <span class="pr">style</span><span class="op">=</span>{{ <span class="pr">width</span>: <span class="nb">200</span>, <span class="pr">height</span>: <span class="nb">200</span>, <span class="pr">backgroundColor</span>: <span class="st">'red'</span> }} <span class="cp">/&gt;</span>
+  <span class="cp">&lt;View</span> <span class="pr">style</span><span class="op">=</span>{{ <span class="pr">width</span>: <span class="nb">200</span>, <span class="pr">height</span>: <span class="nb">200</span>, <span class="pr">backgroundColor</span>: <span class="st">'blue'</span> }} <span class="cp">/&gt;</span>
+<span class="cp">&lt;/ScrollView&gt;</span></pre>
+
+<h3>PagerView — swipeable pages</h3>
+<pre><span class="cm">// npm install react-native-pager-view</span>
+<span class="kw">import</span> <span class="cp">PagerView</span> <span class="kw">from</span> <span class="st">'react-native-pager-view'</span>;
+
+<span class="cp">&lt;PagerView</span> <span class="pr">style</span><span class="op">=</span>{{ <span class="pr">flex</span>: <span class="nb">1</span> }} <span class="pr">initialPage</span><span class="op">=</span>{<span class="nb">0</span>}<span class="cp">&gt;</span>
+  <span class="cp">&lt;View</span> <span class="pr">key</span><span class="op">=</span><span class="st">"1"</span><span class="cp">&gt;&lt;Text&gt;</span>Page 1<span class="cp">&lt;/Text&gt;&lt;/View&gt;</span>
+  <span class="cp">&lt;View</span> <span class="pr">key</span><span class="op">=</span><span class="st">"2"</span><span class="cp">&gt;&lt;Text&gt;</span>Page 2<span class="cp">&lt;/Text&gt;&lt;/View&gt;</span>
+<span class="cp">&lt;/PagerView&gt;</span></pre>
+
+<!-- ============================================================ -->
+<h2>12. Navigation — React Navigation</h2>
+<p class="lab">Lab 6 — wk4_lab6, slides 7-19</p>
+<!-- ============================================================ -->
+
+<h3>Setup</h3>
+<pre>npm install @react-navigation/native @react-navigation/native-stack
+npx expo install react-native-screens react-native-safe-area-context</pre>
+
+<h3>App.js structure</h3>
+<pre><span class="kw">import</span> { <span class="cp">NavigationContainer</span> } <span class="kw">from</span> <span class="st">'@react-navigation/native'</span>;
+<span class="kw">import</span> { <span class="fn">createNativeStackNavigator</span> } <span class="kw">from</span> <span class="st">'@react-navigation/native-stack'</span>;
+
+<span class="kw">const</span> Stack <span class="op">=</span> <span class="fn">createNativeStackNavigator</span>();
+
+<span class="cp">&lt;NavigationContainer&gt;</span>
+  <span class="cp">&lt;Stack.Navigator</span> <span class="pr">initialRouteName</span><span class="op">=</span><span class="st">"Home"</span><span class="cp">&gt;</span>
+    <span class="cp">&lt;Stack.Screen</span> <span class="pr">name</span><span class="op">=</span><span class="st">"Home"</span> <span class="pr">component</span><span class="op">=</span>{<span class="cp">HomeScreen</span>} <span class="cp">/&gt;</span>
+    <span class="cp">&lt;Stack.Screen</span> <span class="pr">name</span><span class="op">=</span><span class="st">"Profile"</span> <span class="pr">component</span><span class="op">=</span>{<span class="cp">ProfileScreen</span>} <span class="cp">/&gt;</span>
+  <span class="cp">&lt;/Stack.Navigator&gt;</span>
+<span class="cp">&lt;/NavigationContainer&gt;</span></pre>
+
+<div class="box blue">
+<strong>Out-of-the-box features:</strong> Header bar with title, safe area management, back button on pushed screens, platform-specific animations (iOS slide, Android fade/zoom).
+</div>
+
+<h3>navigation prop</h3>
+<p class="lab">Lab 6 — slides 11-13</p>
+<pre><span class="cm">// Auto-injected into screen components. NOT available in child components.</span>
+
+<span class="cm">// Navigate to screen:</span>
+navigation.<span class="fn">navigate</span>(<span class="st">'Profile'</span>);
+
+<span class="cm">// Navigate with data:</span>
+navigation.<span class="fn">navigate</span>(<span class="st">'Profile'</span>, { <span class="pr">profile</span>: DUMMY_PROFILE });
+
+<span class="cm">// Go back:</span>
+navigation.<span class="fn">goBack</span>();</pre>
+
+<h3>route prop — receiving params</h3>
+<p class="lab">Lab 6 — slides 17-18</p>
+<pre><span class="cm">// Auto-injected into screen components alongside navigation.</span>
+
+<span class="kw">const</span> <span class="fn">ProfileScreen</span> <span class="op">=</span> ({ route }) <span class="op">=&gt;</span> {
+  <span class="kw">const</span> profile <span class="op">=</span> route.<span class="pr">params</span>.<span class="pr">profile</span>;
+  <span class="kw">return</span> <span class="cp">&lt;Text&gt;</span>{profile.<span class="pr">name</span>}<span class="cp">&lt;/Text&gt;</span>;
+};</pre>
+
+<h3>useNavigation and useRoute hooks</h3>
+<p class="lab">Lab 6 — slides 16, 19</p>
+<div class="box green">
+For components that are NOT registered screens (child/nested components), use hooks to access navigation and route without prop drilling.
+</div>
+<pre><span class="kw">import</span> { <span class="fn">useNavigation</span>, <span class="fn">useRoute</span> } <span class="kw">from</span> <span class="st">'@react-navigation/native'</span>;
+
+<span class="kw">const</span> navigation <span class="op">=</span> <span class="fn">useNavigation</span>();
+<span class="kw">const</span> route <span class="op">=</span> <span class="fn">useRoute</span>();</pre>
+
+<h3>Summary table from slides</h3>
+<p class="lab">Lab 6 — slide 20</p>
+<table>
+<tr><th>Context</th><th>Navigation Actions</th><th>Accessing Params</th></tr>
+<tr><td>Screen component</td><td><code>navigation</code> prop</td><td><code>route</code> prop</td></tr>
+<tr><td>Nested/child component</td><td><code>useNavigation()</code> hook</td><td><code>useRoute()</code> hook</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<h2>13. Fetch — API Calls</h2>
+<p class="lab">Lab 7 — wk4_lab7, slides 13-16</p>
+<!-- ============================================================ -->
+
+<pre><span class="kw">const</span> <span class="fn">fetchData</span> <span class="op">=</span> <span class="kw">async</span> () <span class="op">=&gt;</span> {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> response <span class="op">=</span> <span class="kw">await</span> <span class="fn">fetch</span>(url, options);  <span class="cm">// 1st await: gets headers</span>
+    <span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> response.<span class="fn">json</span>();       <span class="cm">// 2nd await: reads body</span>
+    <span class="fn">setData</span>(result);
+  } <span class="kw">catch</span> (error) {
+    <span class="cp">Alert</span>.<span class="fn">alert</span>(<span class="st">'Error'</span>, error.<span class="pr">message</span>);
+  }
+};</pre>
+
+<div class="box blue">
+<strong>Why two awaits?</strong> (From slide 14) This is a performance feature. It lets you check <code>response.status</code> (404, 500) before wasting time downloading the body.
+</div>
+
+<h3>Request configuration object</h3>
+<p class="lab">Lab 7 — slide 13</p>
+<pre><span class="kw">const</span> options <span class="op">=</span> {
+  <span class="pr">method</span>: <span class="st">'GET'</span>,       <span class="cm">// or 'POST', 'PUT', 'DELETE'</span>
+  <span class="pr">headers</span>: {
+    <span class="st">'Content-Type'</span>: <span class="st">'application/json'</span>,
+  },
+  <span class="cm">// body only for POST/PUT:</span>
+  <span class="pr">body</span>: JSON.<span class="fn">stringify</span>({ <span class="pr">name</span>: <span class="st">'Test'</span> }),
+};</pre>
+
+<h3>try...catch</h3>
+<p class="lab">Lab 7 — slide 15</p>
+<div class="box orange">
+<strong>From slides:</strong> High chance of failure when interacting with the outside world. Without a try block, an error will crash the app. The catch block prevents this — the error details are caught and handled instead.
+</div>
+
+<h3>Extracting data from response</h3>
+<p class="lab">Lab 7 — slide 16</p>
+<pre><span class="cm">// Text response:</span>
+<span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> response.<span class="fn">text</span>();
+
+<span class="cm">// JSON response:</span>
+<span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> response.<span class="fn">json</span>();
+
+<span class="cm">// Access a field (optional chaining from slides):</span>
+<span class="kw">const</span> quoteText <span class="op">=</span> result[<span class="nb">0</span>]?.<span class="pr">text</span> || <span class="st">'No quote found'</span>;
+<span class="cm">// ?. checks if result[0] is null/undefined before accessing .text</span></pre>
+
+<!-- ============================================================ -->
+<h2>14. Component Rules</h2>
+<p class="lab">Lab 2 — wk1_lab2, slide 11 | Lab 3 — wk2_lab3, slides 12-16</p>
+<!-- ============================================================ -->
+
+<div class="box blue">
+1. Function name <strong>must start uppercase</strong>: <code>HomeScreen</code> not <code>homeScreen</code><br>
+2. Must <strong>return renderable JSX</strong><br>
+3. Must have <strong>one root element</strong> — wrap in <code>&lt;View&gt;</code> or <code>&lt;&gt;...&lt;/&gt;</code><br>
+4. Must have <code>export default ComponentName</code> at bottom<br>
+5. Every RN component must be <strong>imported</strong> from <code>'react-native'</code><br>
+6. <code>&lt;Button&gt;</code> is <strong>self-closing</strong> with <code>title</code> prop — not <code>&lt;Button&gt;text&lt;/Button&gt;</code><br>
+7. All text must be inside <code>&lt;Text&gt;</code> — raw text in <code>&lt;View&gt;</code> crashes the app
+</div>
+
+<!-- ============================================================ -->
+<h2>15. React Web (Vite) vs React Native</h2>
+<p class="lab">Lab 2 — wk1_lab2, slides 6-11 | Lab 3 — wk2_lab3, slides 11-16</p>
+<!-- ============================================================ -->
+
+<table>
+<tr><th>React Web (Vite)</th><th>React Native (Expo)</th></tr>
+<tr><td><code>npx create-vite@7 app --template react</code></td><td><code>npx create-expo-app app --template blank</code></td></tr>
+<tr><td>Entry: <code>index.html</code> → <code>main.jsx</code> → <code>App.jsx</code></td><td>Entry: <code>App.js</code> (Expo renders it automatically)</td></tr>
+<tr><td>Uses <code>.jsx</code> extension</td><td>Uses <code>.js</code> extension</td></tr>
+<tr><td>CSS files (<code>.css</code>)</td><td><code>StyleSheet.create()</code></td></tr>
+<tr><td><code>&lt;div&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;input&gt;</code>, <code>&lt;img&gt;</code></td><td><code>&lt;View&gt;</code>, <code>&lt;Text&gt;</code>, <code>&lt;TextInput&gt;</code>, <code>&lt;Image&gt;</code></td></tr>
+<tr><td><code>className="box"</code></td><td><code>style={styles.box}</code></td></tr>
+<tr><td><code>onClick</code></td><td><code>onPress</code></td></tr>
+<tr><td><code>window.alert()</code></td><td><code>Alert.alert()</code></td></tr>
+<tr><td>Default flex direction: <code>row</code></td><td>Default flex direction: <code>column</code></td></tr>
+<tr><td><code>npm run dev</code></td><td><code>npx expo start --localhost</code></td></tr>
+</table>
+
+<div class="box green">
+<strong>From Lab 2 slides:</strong> In a Vite project, <code>index.js</code> is replaced by <code>main.jsx</code>. The browser opens <code>index.html</code>, sees the script tag pointing to <code>main.jsx</code>, which runs <code>ReactDOM.createRoot(document.getElementById('root')).render(&lt;App /&gt;)</code>.
+</div>
+
+<!-- ============================================================ -->
+<h2>16. What is Expo</h2>
+<p class="lab">Lab 1 — wk1_lab1, slides 15, 20</p>
+<!-- ============================================================ -->
+
+<div class="box blue">
+<strong>Expo CLI</strong> is a free, managed app development service. Very convenient. You can leave Expo anytime. The alternative is React Native CLI (bare bone, easier to integrate native code).
+<br><br>
+<strong>Expo Go</strong> = app on your phone to preview your project via QR code.
+<br><br>
+<strong>Snack</strong> = <code>https://snack.expo.dev/</code> — browser-based Expo emulator.
+</div>
+
+<!-- ============================================================ -->
+<h2>17. App Structure &amp; Key Files</h2>
+<p class="lab">Lab 1 — wk1_lab1, slides 25-27 | Lab 2 — wk1_lab2, slides 8-10</p>
+<!-- ============================================================ -->
+
+<table>
+<tr><th>File/Folder</th><th>Purpose (from slides)</th></tr>
+<tr><td><code>.expo/</code></td><td>Internally used Expo information</td></tr>
+<tr><td><code>assets/</code></td><td>Store images — app icon and images used inside the app</td></tr>
+<tr><td><code>node_modules/</code></td><td>Third-party packages used under the hood</td></tr>
+<tr><td><code>app.json</code></td><td>Configure settings and behaviours. Picked up by Expo when app is built. Set name, background colours.</td></tr>
+<tr><td><code>App.js</code></td><td>The only real code file in the starter project. A regular React component using special JSX elements from react-native.</td></tr>
+<tr><td><code>package.json</code></td><td>Lists project dependencies</td></tr>
+<tr><td><code>package-lock.json</code></td><td>Locks dependency versions</td></tr>
+</table>
+
+<div class="box green">
+<strong>Vite file connection (from Lab 2 slide notes):</strong><br>
+<code>index.html</code> = the house (empty structure with <code>&lt;div id="root"&gt;</code>)<br>
+<code>main.jsx</code> = the interior designer (finds the root room, brings in furniture)<br>
+<code>App.jsx</code> = the furniture (your actual components)<br>
+<code>index.css</code> = global styles (resets, fonts, root variables)<br>
+<code>App.css</code> = component-specific styles
+</div>
+
+</body>
+</html>
